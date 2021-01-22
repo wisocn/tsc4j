@@ -1,0 +1,36 @@
+//
+// build.gradle
+//
+
+dependencyManagement {
+  imports {
+    mavenBom "io.micronaut:micronaut-bom:${micronautVersion}"
+  }
+}
+
+repositories {
+  maven { url  "https://dl.bintray.com/micronaut/core-releases-local" }
+}
+
+dependencies {
+  annotationProcessor     "io.micronaut:micronaut-inject-java"
+
+  api                     project(":${rootProject.name}-core")
+
+  api                     "io.micronaut:micronaut-inject"
+  compileOnly             "io.micronaut:micronaut-inject-java"
+  compileOnly             "io.micronaut:micronaut-runtime"
+
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+
+  testAnnotationProcessor "io.micronaut:micronaut-inject-groovy"
+  testImplementation      "io.micronaut:micronaut-http-server-netty"
+  testImplementation      "io.micronaut.test:micronaut-test-spock:${micronautTestVersion}"
+  testImplementation      "io.micronaut.test:micronaut-test-junit5:${micronautTestVersion}"
+  testImplementation      "io.micronaut:micronaut-inject-groovy"
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

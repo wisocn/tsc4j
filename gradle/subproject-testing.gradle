@@ -1,0 +1,32 @@
+//
+// Gradle build fragment
+//
+
+// enable support for reproducible JAR archive builds
+// SEE: https://docs.gradle.org/3.5/userguide/working_with_files.html#sec:reproducible_archives
+
+apply plugin: "com.adarshr.test-logger"
+
+test {
+  failFast = true
+
+  reports {
+    html {
+      enabled = true
+      destination = file("${rootDir}/build/reports/test/${project.name}")
+    }
+
+    // disable test execution cache; tests will be always re-ran, even if source code was not modified.
+    //outputs.upToDateWhen { false }
+  }
+}
+
+// test-logger plugin
+testlogger {
+  theme           "mocha"
+  slowThreshold   500
+  showSummary     true
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

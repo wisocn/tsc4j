@@ -1,0 +1,32 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+  api                     project(":${rootProject.name}-aws-common")
+
+  api                     "com.amazonaws:aws-java-sdk-s3"
+  api                     "com.amazonaws:aws-java-sdk-ssm"
+
+  compileOnly             project(":${rootProject.name}-cli")
+  annotationProcessor     "info.picocli:picocli-codegen"
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+  
+  //testImplementation      "org.testcontainers:spock"
+  //testImplementation      "org.testcontainers:localstack"
+
+  testImplementation      "io.findify:s3mock_2.12:0.2.5"
+  // test dependencies pull different versions, lock
+  testImplementation      "com.fasterxml.jackson.core:jackson-databind:2.6.7.1"
+}
+
+compileJava {
+  // for picocli-codegen
+  options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

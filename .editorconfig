@@ -1,0 +1,21 @@
+#
+# .editorconfig
+#
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{groovy,java,scala,kt}]
+ij_java_doc_enable_formatting = true
+ij_any_if_brace_force = always
+
+[*.{conf,xml,yml,json,properties,gradle}]
+indent_size = 2
+
+# vim:shiftwidth=2 softtabstop=2 expandtab
+# EOF

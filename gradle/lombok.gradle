@@ -1,0 +1,14 @@
+//
+// Gradle build fragment
+//
+
+apply plugin: "io.freefair.lombok"
+lombok {
+  version = "${lombokVersion}"
+}
+
+// make sure that plugin doesn't touch existing lombok configuration
+generateLombokConfig.enabled = false
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

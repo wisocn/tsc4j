@@ -1,0 +1,27 @@
+//
+// Gradle build fragment
+//
+
+java {
+  //withJavadocJar()
+  //withSourcesJar()
+
+  // SEE: https://docs.gradle.org/6.8/release-notes.html#dependency-management-improvements
+  consistentResolution {
+    useCompileClasspathVersions()
+  }
+}
+
+tasks.withType(JavaCompile) {
+  sourceCompatibility = targetCompatibility = 8
+
+  options.encoding = "UTF-8"
+  options.incremental = true
+
+  options.compilerArgs += ["-Xlint:deprecation,overrides,divzero,empty,fallthrough,finally,unchecked,static,varargs", "-Xdiags:verbose"]
+  // TODO: enable stricter warnings in the future
+  //options.compilerArgs += [ "-Xlint:deprecation,unchecked,classfile,divzero,empty,fallthrough,finally,options,overrides,rawtypes,removal,serial,static,varargs", "-Xdiags:verbose" ]
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

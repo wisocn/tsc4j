@@ -1,0 +1,105 @@
+#
+# CI github action
+#
+
+name: Java CI
+on:
+  push:
+    branches:
+      - '**'
+  create:
+    tags:
+      - '**'
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID:      foo
+      AWS_SECRET_ACCESS_KEY:  bar
+      AWS_REGION:             us-west-1
+    strategy:
+      matrix:
+        java: [ '11' ]
+
+    services:
+      # AWS EC2 metadata mock
+      ec2-metadata:
+        image: bpholt/fake-ec2-metadata-service
+        env:
+          BIND_ADDR: 0.0.0.0
+        ports:
+          - 9090:80
+      # AWS localstack services
+      localstack:
+        image: localstack/localstack:0.12.5
+        env:
+          SERVICES: ssm,s3
+          DATA_DIR: /tmp/localstack/data
+          FORCE_NONINTERACTIVE: "true"
+          # USE_SSL: true
+        ports:
+          - 4655:4655
+        volumes:
+          - /tmp/localstack:/tmp/localstack
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Restore build dependencies
+        id: restore-caches
+        uses: actions/cache@v2
+        with:
+          path: |
+             ~/.gradle/caches
+             ~/.gradle/wrapper
+             ~/.cache/google-cloud-tools-java
+          key: gradle-${{ hashFiles('**/*.gradle', '**/gradle*.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Warn about missing caches
+        if: steps.restore-caches.outputs.cache-hit != 'true'
+        run: |
+          echo "WARNING: Build cache was not restored."
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Run Gradle build
+        run: ./gradlew clean build -s
+
+      - name: Publish JUnit test results
+        if: failure()
+        uses: scacap/action-surefire-report@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+
+      - name: Upload Gradle test reports
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: gradle-test-reports
+          path: 'build/reports/test/**'
+
+      - name: Publish built artifacts to Sonatype OSSHR
+        # publish to sonatype OSSHR only if:
+        # * we're merging PR to the main branch
+        # * we've built a git tag
+        if: success() && matrix.java == '11' && ( (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) || (startsWith(github.ref, 'refs/tags/v')) )
+        # if: success() && github.base_ref == 'refs/heads/main'
+        env:
+          OSSHR_USER:               ${{ secrets.OSSHR_USER }}
+          OSSHR_PASS:               ${{ secrets.OSSHR_PASS }}
+          SIGNING_GPG_KEY_CONTENT:  ${{ secrets.SIGNING_GPG_KEY_CONTENT }}
+          SIGNING_GPG_KEY_PASSWORD: ${{ secrets.SIGNING_GPG_KEY_PASSWORD }}
+        run: ./gradlew publish -s
+
+
+# vim:shiftwidth=2 softtabstop=2 expandtab
+# EOF

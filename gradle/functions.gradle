@@ -1,0 +1,16 @@
+//
+// Gradle build fragment
+//
+
+ext.sysPropOrEnvVar = { String propName, String defaultVal = '' ->
+  System.getProperty(propName) ?:
+    System.getenv(propName.toUpperCase().replace('.', '_')) ?:
+      defaultVal
+}
+
+ext.isJavadocPublishingEnabled = {
+  Boolean.parseBoolean(sysPropOrEnvVar('javadoc.enabled', 'true'))
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

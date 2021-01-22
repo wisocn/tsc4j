@@ -1,0 +1,15 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+
+  api                     "com.google.cloud:google-cloud-storage"
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

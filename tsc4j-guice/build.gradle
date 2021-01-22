@@ -1,0 +1,26 @@
+//
+// build.gradle
+//
+
+dependencyManagement {
+  imports {
+    mavenBom "com.google.inject:guice-bom:${guiceVersion}"
+  }
+}
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+
+  api                     "com.google.inject:guice"
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+  testImplementation      "org.spockframework:spock-guice"
+}
+
+// Jacoco test reports fails on guice-enabled classes
+// due to outdated ASM dependency
+jacocoTestReport.enabled = false
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

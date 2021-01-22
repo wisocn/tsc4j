@@ -1,0 +1,3 @@
+com.github.tsc4j.core.impl.Rot13ConfigTransformerLoader
+com.github.tsc4j.core.impl.NoopValueProviderLoader
+com.github.tsc4j.core.impl.DummyConfigTransformerLoader

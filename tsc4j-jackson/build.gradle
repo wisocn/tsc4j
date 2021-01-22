@@ -1,0 +1,16 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+  api                     "com.fasterxml.jackson.core:jackson-databind"
+
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+  testImplementation      "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+  testImplementation      "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+  testImplementation      "com.fasterxml.jackson.module:jackson-module-parameter-names"
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

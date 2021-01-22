@@ -1,0 +1,23 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                   project(":${rootProject.name}-core")
+
+  api                   "info.picocli:picocli"
+  annotationProcessor   "info.picocli:picocli-codegen"
+
+  compileOnly           "ch.qos.logback:logback-classic"
+
+  // abstract tests from core subproject
+  testImplementation    project(path: ":${rootProject.name}-core", configuration: "testOutput")
+}
+
+compileJava {
+  // for picocli-codegen
+  options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

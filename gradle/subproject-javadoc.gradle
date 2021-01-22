@@ -1,0 +1,51 @@
+//
+// Gradle build fragment
+//
+
+//println("inside javadoc fragment ${project.name} has sources: ${hasSources}")
+
+javadoc {
+  onlyIf { hasSources }
+
+  // use original sources
+  //source = sourceSets.main
+
+  // use delombokized sources
+  source = delombok
+
+  options.encoding "UTF-8"
+  options.addStringOption("Xdoclint:none", "-quiet")
+
+  // javadoc task might fail on certain version >= 9 JDKs
+  // due to JPMS module stuff, but we compile to JDK8 anyway
+  options.addStringOption("source", "8")
+
+  // don't fail the task in case of javadoc errors
+  failOnError = false
+
+  // this one resolves dependencies, breaks build
+  //options.addStringOption('-module-path', classpath.asPath)
+
+  // if we're on JDK9+ we can enable html5 javadoc output
+  if (JavaVersion.current().isJava9Compatible()) {
+    options.addBooleanOption('html5', true)
+  }
+
+  // make sure that we have nice hyperlinks to external used APIs.
+  options.links(
+    "https://docs.oracle.com/javase/9/docs/api/",
+    "https://static.javadoc.io/org.projectlombok/lombok/${lombokVersion}",
+    "https://static.javadoc.io/com.typesafe/config/${typesafeConfigVersion}"
+  )
+}
+
+
+task javadocJar(type: Jar, dependsOn: [classes,javadoc], overwrite: false) {
+  onlyIf { hasSources }
+
+  archiveClassifier = "javadoc"
+  from javadoc.destinationDir
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

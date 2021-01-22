@@ -1,0 +1,6 @@
+com.github.tsc4j.cli.GetCommand
+com.github.tsc4j.cli.WatchCommand
+com.github.tsc4j.cli.TestCommand
+com.github.tsc4j.cli.SourcesCommand
+com.github.tsc4j.cli.TransformersCommand
+com.github.tsc4j.cli.ValueProvidersCommand

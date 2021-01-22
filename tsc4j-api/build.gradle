@@ -1,0 +1,10 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                     "com.typesafe:config"
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

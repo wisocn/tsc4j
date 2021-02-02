@@ -1,0 +1,23 @@
+//
+// Gradle build fragment
+//
+
+apply plugin: "jacoco"
+
+jacoco {
+  toolVersion   = "${jacocoVersion}"
+}
+
+jacocoTestReport {
+  dependsOn test
+  reports {
+    csv.enabled false
+    html.destination file("${buildDir}/reports/jacoco")
+  }
+}
+
+// make sure that jacoco test report gets ran after test run
+test.finalizedBy jacocoTestReport
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

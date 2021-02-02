@@ -1,0 +1,52 @@
+//
+// Gradle build fragment
+//
+
+import org.gradle.util.GradleVersion
+
+// badass-jar plugin
+apply plugin: "org.beryx.jar"
+
+
+// enable support for reproducible JAR archive builds
+// SEE: https://docs.gradle.org/3.5/userguide/working_with_files.html#sec:reproducible_archives
+tasks.withType(AbstractArchiveTask) {
+  preserveFileTimestamps  = false
+  reproducibleFileOrder   = true
+}
+
+jar {
+  onlyIf { hasSources }
+
+  // badass-jar-plugin
+  def moduleInfoPath = 'src/main/module/module-info.java'
+  if (new File(moduleInfoPath).exists()) {
+    multiRelease = true
+    moduleInfo = moduleInfoPath
+  }
+
+  manifest {
+    attributes "Implementation-Title": "${project.archivesBaseName}",
+      "Implementation-Version": "${project.version}",
+      "Multi-Release": "true"
+  }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes, overwrite: false) {
+  onlyIf { hasSources }
+
+  // use original sources
+  //from sourceSets.main.allSource
+
+  // use delombokized sources
+  from delombok
+
+  archiveClassifier = "sources"
+
+  if (GradleVersion.current() >= GradleVersion.version("6.0")) {
+    duplicatesStrategy = DuplicatesStrategy.FAIL // don't allow duplicates
+  }
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

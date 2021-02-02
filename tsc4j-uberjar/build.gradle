@@ -1,0 +1,59 @@
+//
+// build.gradle
+//
+
+plugins {
+  id "application"
+  //id "com.github.johnrengelman.shadow"
+}
+
+dependencies {
+  implementation          project(":${rootProject.name}-cli")
+  implementation          project(":${rootProject.name}-aws")
+  implementation          project(":${rootProject.name}-credstash")
+
+  // other tsc4j modules
+  //implementation        project(":${rootProject.name}-gcp")
+
+  // generates graal native-image configurations
+  annotationProcessor     "info.picocli:picocli-codegen"
+
+  // JDK11 compatibility
+  implementation          "jakarta.xml.bind:jakarta.xml.bind-api"
+
+  // logging
+  // use logback 1.1.11, which doesn't spawn threads by default
+  implementation          "ch.qos.logback:logback-classic:1.1.11"
+}
+
+compileJava {
+  // for picocli-codegen
+  options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+mainClassName = "com.github.tsc4j.cli.Tsc4jCli"
+
+/*
+shadowJar {
+  mergeServiceFiles()
+
+  preserveFileTimestamps  = false
+  archiveBaseName         = "tsc4j"
+  classifier              = null    // don't append -all to jar filename
+  archiveVersion          = null    // don't append version to jar filename
+}
+
+//build.finalizedBy shadowJar
+
+// don't create javadoc
+javadoc.enabled = false
+
+// application/shadowJar plugins: disable creation of distribution archives
+distZip.enabled = distTar.enabled = shadowDistTar.enabled = shadowDistZip.enabled = false
+ */
+
+// don't publish anything
+tasks.withType(AbstractPublishToMaven).all { it.onlyIf { false } }
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

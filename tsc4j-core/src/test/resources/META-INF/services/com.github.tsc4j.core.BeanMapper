@@ -1,0 +1,4 @@
+com.github.tsc4j.core.impl.BadBeanMapper1
+com.github.tsc4j.core.impl.BadBeanMapper2
+com.github.tsc4j.core.impl.BadBeanMapper3
+com.github.tsc4j.core.impl.beans.NonExistingBeanMapper

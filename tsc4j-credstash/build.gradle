@@ -1,0 +1,26 @@
+//
+// build.gradle
+//
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+  api                     project(":${rootProject.name}-aws")
+
+  api                     "co.wrisk.jcredstash:jcredstash"
+
+  // optional for cli commands
+  compileOnly             project(":${rootProject.name}-cli")
+  annotationProcessor     "info.picocli:picocli-codegen"
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+  testImplementation      "org.slf4j:jcl-over-slf4j"
+}
+
+compileJava {
+  // for picocli-codegen
+  options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

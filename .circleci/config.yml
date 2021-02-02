@@ -1,0 +1,68 @@
+#
+# circleci config.yml
+#
+
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # Image running this build
+      - image: circleci/openjdk:11
+
+      # AWS EC2 metadata mock
+      - image: bpholt/fake-ec2-metadata-service
+        environment:
+          - BIND_ADDR=0.0.0.0
+        ports:
+          - 9090:80
+
+      # AWS localstack environment
+      - image: localstack/localstack:0.12.5
+        environment:
+          - SERVICES=ssm,s3
+          - DATA_DIR=/tmp/localstack/data
+          - FORCE_NONINTERACTIVE=true
+        ports:
+          - 4655:4655
+        volumes:
+          - /tmp/localstack:/tmp/localstack
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+
+      # run tests!
+      - run:
+          name: Run Gradle build
+          command: ./gradlew clean build
+
+      - run:
+          when: always
+          name: Aggregate JUnit test results
+          command: |
+            mkdir -p build/reports/junit  && \
+            find . -type f -iname "TEST-*.xml" -exec cp {} build/reports/junit \;
+
+      - store_test_results:
+          path: build/reports/junit/
+
+      - store_artifacts:
+          destination: gradle-test-reports
+          path: build/reports/test/
+
+      - save_cache:
+          when: always
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+            - ~/.cache/google-cloud-tools-java
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+# vim:shiftwidth=2 softtabstop=2 expandtab
+# EOF

@@ -1,0 +1,45 @@
+//
+// build.gradle
+//
+
+plugins {
+  id "com.gorylenko.gradle-git-properties"
+}
+
+dependencies {
+  api                     project(":tsc4j-api")
+  api                     "org.slf4j:slf4j-api"
+
+  testImplementation      "org.slf4j:jcl-over-slf4j"
+  testImplementation      "ch.qos.logback:logback-classic"
+  testImplementation      "com.github.tomakehurst:wiremock:2.18.0"
+}
+
+configurations {
+  testOutput.extendsFrom (testImplementation)
+}
+
+compileTestJava {
+  sourceCompatibility = 11
+  targetCompatibility = 11
+}
+
+task testJar (type: Jar, dependsOn: testClasses) {
+  from sourceSets.test.output
+  archiveClassifier = 'test'
+}
+
+artifacts {
+  testOutput testJar
+}
+
+gitProperties {
+  dateFormat          = "yyyy-MM-dd' 'HH:mm:ssZ"
+  dateFormatTimeZone  = "UTC"
+  gitPropertiesDir    = "${project.buildDir}/resources/main/com/github/tsc4j/core"
+
+  keys                = [ 'git.build.version', 'git.commit.id', 'git.commit.id.abbrev','git.commit.time' ]
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

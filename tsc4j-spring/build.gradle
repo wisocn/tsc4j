@@ -1,0 +1,40 @@
+//
+// build.gradle
+//
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+
+dependencies {
+  api                     project(":${rootProject.name}-core")
+
+  api                     "org.springframework.cloud:spring-cloud-context"
+  api                     "org.springframework.boot:spring-boot-autoconfigure"
+
+  compileOnly             "org.springframework.boot:spring-boot-configuration-processor"
+  compileOnly             "org.springframework.boot:spring-boot-actuator"
+  compileOnly             "javax.inject:javax.inject"
+  compileOnly             "com.fasterxml.jackson.core:jackson-databind"
+
+  // abstract tests from core subproject
+  testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
+
+  testImplementation      "org.slf4j:jcl-over-slf4j"
+  testImplementation      "org.spockframework:spock-spring"
+  testImplementation      "org.springframework.boot:spring-boot-starter-test"
+  testImplementation      "org.springframework.boot:spring-boot-configuration-processor"
+  testImplementation      "org.springframework.boot:spring-boot-actuator"
+}
+
+jar {
+  manifest {
+    attributes('Automatic-Module-Name': "${project.group}.spring")
+  }
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

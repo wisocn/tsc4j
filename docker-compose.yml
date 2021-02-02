@@ -1,0 +1,37 @@
+#
+# docker-compose file required for running tests
+#
+
+version: '2'
+
+services:
+
+  # AWS metadata mock
+  ec2-metadata:
+    image: bpholt/fake-ec2-metadata-service
+    environment:
+      - BIND_ADDR=0.0.0.0
+    ports:
+      - 9090:80
+
+  # AWS localstack
+  localstack:
+    image: localstack/localstack:0.12.5
+    environment:
+      SERVICES: ssm,s3
+      DATA_DIR: /tmp/localstack/data
+      FORCE_NONINTERACTIVE: "true"
+      # USE_SSL: true
+
+    volumes:
+      - /tmp/localstack:/tmp/localstack
+
+    depends_on:
+      - ec2-metadata
+
+    # SEE: https://github.com/localstack/localstack#overview
+    ports:
+      - 4566:4566
+
+# vim:shiftwidth=2 softtabstop=2 expandtab
+# EOF

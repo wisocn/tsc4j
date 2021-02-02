@@ -1,0 +1,64 @@
+//
+// build.gradle
+//
+
+plugins {
+  id "ru.vyarus.pom"
+  id "maven-publish"
+}
+
+description = "${rootProject.name} Bill Of Materials (BOM)"
+
+import groovy.xml.XmlUtil
+
+withPomXml {
+  it.appendNode('properties').with {
+    props.each { nm, val -> appendNode(nm, val) }
+  }
+
+  // we need to remove previous dependency management stuff
+  Node dependencyManagementOrig = it.dependencyManagement.dependencies[0]
+  def depMgmtParent = dependencyManagementOrig.parent()
+  depMgmtParent.remove(dependencyManagementOrig)
+
+  // create new managed dependency list
+  Node managedDependencies = new Node(depMgmtParent, dependencyManagementOrig.name())
+
+  // iterate all projects, add new managed dependencies to the bom
+  project.rootProject.subprojects.each {
+    // we don't want to include ourselves
+    if (it.name == project.name) return
+
+    // we don't want to include example projects as well
+    if (it.toString() ==~ /^.*example/) return
+
+    // we absolutely want to ignore some specific sub-projects
+    if (it.name ==~ /^.*uberjar/) return
+
+    logger.info("  including to BOM: $it")
+
+    Node dep = managedDependencies.appendNode('dependency')
+    dep.appendNode('groupId').value = it.group
+    dep.appendNode('artifactId').value = it.name
+    dep.appendNode('version').value = it.version
+  }
+
+  // remove any existing dependencies (bom should not have any dependencies)
+  def dependencies = it.dependencies[0]
+  if (dependencies) {
+    def parent = dependencies.parent()
+    // println("removing: "+ XmlUtil.serialize(dependencies))
+    parent.remove(dependencies)
+  }
+
+  logger.info("managed dependency list:\n{}", XmlUtil.serialize(managedDependencies))
+  logger.debug("modified pom xml:\n{}", XmlUtil.serialize(it))
+}
+
+// remove all artifacts from deploy list (we want to deploy only pom file)
+//publishing.publications.main.artifacts = []
+publishing.publications.mavenJava.artifacts = []
+javadoc.enabled = false
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

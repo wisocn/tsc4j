@@ -1,0 +1,46 @@
+//
+// Gradle build fragment
+//
+
+apply plugin: "maven-publish"
+
+apply from: "${rootDir}/gradle/subproject-signing.gradle"
+
+publishing {
+  repositories {
+    maven {
+      def urlSnapshots  = 'https://oss.sonatype.org/content/repositories/snapshots/'
+      def urlReleases   = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+
+      url = isReleaseVersion ? urlReleases : urlSnapshots
+      credentials {
+        username sysPropOrEnvVar('osshr.user')
+        password sysPropOrEnvVar('osshr.pass')
+      }
+    }
+  }
+
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      versionMapping {
+        usage('java-api')     { fromResolutionOf('runtimeClasspath') }
+        usage('java-runtime') { fromResolutionResult() }
+      }
+
+      // sources jar...
+      if (tasks.findByName("sourcesJar")) {
+        artifact sourcesJar
+      }
+
+      // javadoc jar
+      if (isJavadocPublishingEnabled() && tasks.findByName("javadocJar")) {
+        artifact javadocJar
+      }
+    }
+  }
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

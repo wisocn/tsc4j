@@ -179,14 +179,14 @@ final class SsmFacade extends BaseInstance implements Closeable {
      * @param param parameter
      * @return config value
      */
-    ConfigValue toConfigValue(@NonNull Parameter param) {
+    static ConfigValue toConfigValue(@NonNull Parameter param) {
         val type = ParameterType.fromValue(param.getType());
 
         log.trace("converting to ConfigValue: {}", param);
         val updated = Optional.ofNullable(param.getLastModifiedDate())
             .map(e -> e.toInstant().atZone(ZoneOffset.UTC).toString())
             .orElse("n/a");
-        val originDescription = String.format("%s:%s, vers+ion: %d, modified: %s, arn: %s",
+        val originDescription = String.format("%s:%s, version: %d, modified: %s, arn: %s",
             TYPE, param.getName(), param.getVersion(), updated, param.getARN());
 
         if (type == StringList) {
@@ -340,7 +340,7 @@ final class SsmFacade extends BaseInstance implements Closeable {
         };
     }
 
-    private GetParametersRequest toGetParametersRequest(@NonNull List<String> names, boolean decrypt) {
+    private static GetParametersRequest toGetParametersRequest(@NonNull List<String> names, boolean decrypt) {
         if (names.isEmpty()) {
             throw new IllegalArgumentException("Parameter names cannot be empty.");
         }

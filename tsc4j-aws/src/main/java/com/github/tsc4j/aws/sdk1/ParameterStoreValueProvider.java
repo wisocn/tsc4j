@@ -64,7 +64,7 @@ public final class ParameterStoreValueProvider extends AbstractConfigValueProvid
     @Override
     protected Map<String, ConfigValue> doGet(@NonNull List<String> names) {
         val result = new LinkedHashMap<String, ConfigValue>();
-        ssm.fetch(names).forEach(parameter -> result.put(parameter.getName(), ssm.toConfigValue(parameter)));
+        ssm.fetch(names).forEach(parameter -> result.put(parameter.getName(), SsmFacade.toConfigValue(parameter)));
         return result;
     }
 

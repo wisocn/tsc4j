@@ -330,7 +330,7 @@ public class Tsc4jImplUtils {
      * @param closeable closeable
      * @return true if closing was successful, otherwise false.
      */
-    public static boolean close(Closeable closeable) {
+    public static boolean close(AutoCloseable closeable) {
         return close(closeable, log);
     }
 
@@ -341,7 +341,7 @@ public class Tsc4jImplUtils {
      * @param log       logger used for logging in a case of closing failure
      * @return true if closing was successful, otherwise false.
      */
-    public boolean close(Closeable closeable, @NonNull Logger log) {
+    public boolean close(AutoCloseable closeable, @NonNull Logger log) {
         if (closeable != null) {
             try {
                 closeable.close();

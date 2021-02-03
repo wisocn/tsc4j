@@ -4,16 +4,28 @@
 
 plugins {
   id "application"
-  //id "com.github.johnrengelman.shadow"
+  id "com.github.johnrengelman.shadow"
 }
 
 dependencies {
+  // required tsc4j dependencies
   implementation          project(":${rootProject.name}-cli")
+
+  ////////////////////////////////////////////////////////////////////
+  // BEGIN: optional tsc4j dependencies
+  //        choose only the ones that you actually need
+
+  // AWS platform support
   implementation          project(":${rootProject.name}-aws")
+
+  // credstash support
   implementation          project(":${rootProject.name}-credstash")
 
-  // other tsc4j modules
+  // GCP platform support
   //implementation        project(":${rootProject.name}-gcp")
+
+  // END:   optional tsc4j dependencies
+  ////////////////////////////////////////////////////////////////////
 
   // generates graal native-image configurations
   annotationProcessor     "info.picocli:picocli-codegen"
@@ -31,29 +43,37 @@ compileJava {
   options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
+// don't create javadoc jar
+javadoc.enabled = false
+
+// don't publish anything
+tasks.withType(AbstractPublishToMaven).all { it.onlyIf { false } }
+
+////////////////////////////////////////////////////////////////////////////////
+//                              shadow plugin                                 //
+////////////////////////////////////////////////////////////////////////////////
+
 mainClassName = "com.github.tsc4j.cli.Tsc4jCli"
 
-/*
 shadowJar {
   mergeServiceFiles()
 
   preserveFileTimestamps  = false
   archiveBaseName         = "tsc4j"
-  classifier              = null    // don't append -all to jar filename
-  archiveVersion          = null    // don't append version to jar filename
+  archiveClassifier       = ''      // don't append -all to jar filename
+  archiveVersion          = ''      // don't append version to jar filename
 }
-
-//build.finalizedBy shadowJar
-
-// don't create javadoc
-javadoc.enabled = false
 
 // application/shadowJar plugins: disable creation of distribution archives
 distZip.enabled = distTar.enabled = shadowDistTar.enabled = shadowDistZip.enabled = false
- */
 
-// don't publish anything
-tasks.withType(AbstractPublishToMaven).all { it.onlyIf { false } }
+// run `shadowJar` task only if that was user's preference, i.e. if user explicitly
+// asked for it by manually specifying it as a cli parameter
+def shadowJarEnabled = gradle.startParameter.taskRequests
+  .find {it.args.find {it.contains("shadowJar")} != null  } != null
+if (!shadowJarEnabled) {
+  gradle.startParameter.excludedTaskNames += "shadowJar"
+}
 
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

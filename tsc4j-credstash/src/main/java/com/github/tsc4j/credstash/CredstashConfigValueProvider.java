@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 /**
  * Value provider that provides values from <a href="https://github.com/fugue/credstash">credstash secrets store</a>.
  */
-public final class CredstashConfigValueProvider extends AbstractConfigValueProvider implements WithCache<String, String> {
+public final class CredstashConfigValueProvider extends AbstractConfigValueProvider implements WithCache<String, ConfigValue> {
     static final String TYPE = "credstash";
     static final String DEFAULT_TABLE_NAME = "credential-store";
 
@@ -61,7 +61,7 @@ public final class CredstashConfigValueProvider extends AbstractConfigValueProvi
     private final String tableName;
     private final Map<String, String> encryptionContext;
     @Getter
-    private final Tsc4jCache<String, String> cache;
+    private final Tsc4jCache<String, ConfigValue> cache;
 
     /**
      * Creates new instance.
@@ -133,6 +133,12 @@ public final class CredstashConfigValueProvider extends AbstractConfigValueProvi
         return res;
     }
 
+    @Override
+    protected void doClose() {
+        Tsc4jImplUtils.close(credstash, log);
+        super.doClose();
+    }
+
     /**
      * Creates fetch tasks for specified credential names.
      *
@@ -153,11 +159,11 @@ public final class CredstashConfigValueProvider extends AbstractConfigValueProvi
      */
     protected Map<String, ConfigValue> getCredential(@NonNull String credentialName) {
         return doGetCredential(credentialName)
-            .map(e -> Collections.singletonMap(credentialName, ConfigValueFactory.fromAnyRef(e)))
+            .map(it -> Collections.singletonMap(credentialName, it))
             .orElse(Collections.emptyMap());
     }
 
-    private Optional<String> doGetCredential(@NonNull String credentialName) {
+    private Optional<ConfigValue> doGetCredential(@NonNull String credentialName) {
         try {
             return getFromCache(credentialName)
                 .map(Optional::of)
@@ -175,30 +181,40 @@ public final class CredstashConfigValueProvider extends AbstractConfigValueProvi
      * @param credentialName credential name.
      * @return optional of fetched credential
      */
-    private Optional<String> getCredentialFromCredstash(@NonNull String credentialName) {
+    private Optional<ConfigValue> getCredentialFromCredstash(@NonNull String credentialName) {
         val name = fixCredentialName(credentialName);
         if (name.isEmpty()) {
             return Optional.empty();
         }
 
-        log.debug("{} fetching credential from credstash: '{}'", this, name);
+        return doGetCredentialFromCredstash(name);
+    }
+
+    private Optional<ConfigValue> doGetCredentialFromCredstash(String credentialName) {
+        log.debug("{} fetching credential from credstash: '{}'", this, credentialName);
         try {
-            val secret = credstash.getSecret(name, encryptionContext);
+            val secret = credstash.getSecret(credentialName, encryptionContext);
             return Optional.ofNullable(secret)
-                .map(s -> putToCache(name, s));
+                .map(it -> toConfigValue(credentialName, it))
+                .map(it -> putToCache(credentialName, it));
         } catch (ResourceNotFoundException e) {
             throw Tsc4jException.of("Cannot read credstash table '%s': %%s", e, tableName);
         } catch (RuntimeException e) {
             if (isNotFoundException(e)) {
                 if (allowMissing()) {
-                    log.warn("{} credstash doesn't contain credential: '{}'", this, name);
+                    log.warn("{} credstash doesn't contain credential: '{}'", this, credentialName);
                     return Optional.empty();
                 } else {
-                    throw Tsc4jException.of("Credstash credential doesn't exist: %s", e, name);
+                    throw Tsc4jException.of("Credstash credential doesn't exist: %s", e, credentialName);
                 }
             }
             throw e;
         }
+    }
+
+    private ConfigValue toConfigValue(@NonNull String credentialName, @NonNull String value) {
+        val originDescription = String.format("%s:/%s", TYPE, credentialName);
+        return ConfigValueFactory.fromAnyRef(value, originDescription);
     }
 
     /**

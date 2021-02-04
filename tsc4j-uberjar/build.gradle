@@ -7,6 +7,9 @@ plugins {
   id "com.github.johnrengelman.shadow"
 }
 
+description = "Command line uberjar"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencies {
   // required tsc4j dependencies
   implementation          project(":${rootProject.name}-cli")

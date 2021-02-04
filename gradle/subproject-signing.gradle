@@ -4,23 +4,28 @@
 
 apply plugin: "signing"
 
+def propKeyContent  = "signing.gpg.key.content"
+def propKeyPassword = "signing.gpg.key.password"
+
 signing {
   // fetch PGP key in ascii-export format and password from Java
   // system properties or environment variable
   useInMemoryPgpKeys(
-    sysPropOrEnvVar("signing.gpg.key.content"),
-    sysPropOrEnvVar("signing.gpg.key.password"))
+    sysPropOrEnvVar(propKeyContent),
+    sysPropOrEnvVar(propKeyPassword))
 
   // define what to sign
   sign publishing.publications
 }
 
-/*
 tasks.withType(Sign) {
   // only do gpg sign if there is key defined and this is a release build
-  onlyIf { isReleaseVersion && project.hasProperty('signing.gnupg.keyName') }
+  onlyIf {
+    isReleaseVersion &&
+      project.hasProperty(propKeyContent) &&
+      project.hasProperty(propKeyPassword)
+  }
 }
-*/
 
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

@@ -6,5 +6,8 @@ dependencies {
   api                     "com.typesafe:config"
 }
 
+description = "Public API"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

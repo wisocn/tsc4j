@@ -2,6 +2,9 @@
 // build.gradle
 //
 
+description = "Micronaut framework integration"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencyManagement {
   imports {
     mavenBom "io.micronaut:micronaut-bom:${micronautVersion}"

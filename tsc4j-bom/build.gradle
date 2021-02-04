@@ -4,10 +4,7 @@
 
 plugins {
   id "ru.vyarus.pom"
-  id "maven-publish"
 }
-
-description = "${rootProject.name} Bill Of Materials (BOM)"
 
 import groovy.xml.XmlUtil
 
@@ -18,8 +15,10 @@ withPomXml {
 
   // we need to remove previous dependency management stuff
   Node dependencyManagementOrig = it.dependencyManagement.dependencies[0]
-  def depMgmtParent = dependencyManagementOrig.parent()
-  depMgmtParent.remove(dependencyManagementOrig)
+  def depMgmtParent = dependencyManagementOrig?.parent()
+  if (dependencyManagementOrig?.parent()) {
+    depMgmtParent.remove(dependencyManagementOrig)
+  }
 
   // create new managed dependency list
   Node managedDependencies = new Node(depMgmtParent, dependencyManagementOrig.name())
@@ -55,8 +54,9 @@ withPomXml {
   logger.debug("modified pom xml:\n{}", XmlUtil.serialize(it))
 }
 
+description = "${rootProject.name} Bill Of Materials (BOM)"
+
 // remove all artifacts from deploy list (we want to deploy only pom file)
-//publishing.publications.main.artifacts = []
 publishing.publications.mavenJava.artifacts = []
 javadoc.enabled = false
 

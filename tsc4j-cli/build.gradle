@@ -19,5 +19,8 @@ compileJava {
   options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
+description = "Command line support"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

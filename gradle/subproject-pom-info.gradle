@@ -1,0 +1,58 @@
+//
+// Gradle build fragment
+//
+
+//println("inside javadoc fragment ${project.name} has sources: ${hasSources}")
+
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+
+      pom {
+        name        = project.name
+        url         = "https://github.com/tsc4j/tsc4j/"
+
+        scm {
+          connection          = "scm:git:https://github.com/tsc4j/tsc4j.git"
+          developerConnection = "scm:git:https://github.com/tsc4j/tsc4j.git"
+          url                 = "https://github.com/tsc4j/tsc4j/"
+        }
+
+        licenses {
+          license {
+            name  = "The Apache License, Version 2.0"
+            url   = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+          }
+        }
+
+        developers {
+          developer {
+            id    = "bfg"
+            name  = "Brane F. Gračnar"
+            url   = "https://github.com/bfg"
+          }
+
+          developer {
+            id    = "github-contributors"
+            name  = "The tsc4j project contributors"
+            url   = "https://github.com/tsc4j/tsc4j/graphs/contributors"
+          }
+        }
+      }
+
+      // remove <dependencyManagement> section from POM if
+      // we're not dealing with tsc4j-bom subproject.
+      if (!project.name.endsWith('-bom')) {
+        pom.withXml {
+          asNode().'*'
+                  .findAll { Node e -> e.name() == 'dependencyManagement' }
+                  .each { it.parent().remove(it) }
+        }
+      }
+    }
+  }
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

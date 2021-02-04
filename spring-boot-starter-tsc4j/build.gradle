@@ -2,6 +2,9 @@
 // build.gradle
 //
 
+description = "Spring-Boot Framework integration"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencyManagement {
   imports {
     mavenBom  "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"

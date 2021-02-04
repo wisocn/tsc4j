@@ -157,6 +157,8 @@ public class Tsc4jCli implements Callable<Integer> {
             .setCommandName(Tsc4jImplUtils.NAME)
             .setOut(new PrintWriter(this.stdout))
             .setErr(new PrintWriter(this.stderr))
+            .setUsageHelpAutoWidth(true)
+            .setUsageHelpLongOptionsMaxWidth(30)
             .setExecutionStrategy(new CommandLine.RunLast())
             .setParameterExceptionHandler(this::onInvalidParameter)
             .setExecutionExceptionHandler(this::handleExecutionException)

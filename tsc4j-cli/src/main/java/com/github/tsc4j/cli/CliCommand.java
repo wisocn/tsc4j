@@ -16,12 +16,14 @@
 
 package com.github.tsc4j.cli;
 
+import com.github.tsc4j.api.Ordered;
+
 import java.util.concurrent.Callable;
 
 /**
  * Cli command interface.
  */
-public interface CliCommand extends Callable<Integer>, Comparable<CliCommand> {
+public interface CliCommand extends Callable<Integer>, Ordered, Comparable<CliCommand> {
     /**
      * Returns command name.
      *

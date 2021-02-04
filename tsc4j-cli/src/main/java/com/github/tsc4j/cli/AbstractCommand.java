@@ -19,13 +19,13 @@ package com.github.tsc4j.cli;
 import com.github.tsc4j.core.BaseInstance;
 import com.github.tsc4j.core.Tsc4jConfig;
 import lombok.ToString;
-import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Comparator;
 import java.util.Objects;
 
 import static com.github.tsc4j.core.Tsc4jImplUtils.optString;
@@ -36,6 +36,11 @@ import static com.github.tsc4j.core.Tsc4jImplUtils.optString;
 @ToString
 @Command(sortOptions = false)
 public abstract class AbstractCommand extends BaseInstance implements CliCommand {
+    private static final Comparator<CliCommand> COMPARATOR =
+        Comparator.comparing((CliCommand it) -> it.getGroup())
+            .thenComparing(it -> it.getOrder())
+            .thenComparing(it -> it.getName());
+
     /**
      * Parent command
      */
@@ -222,18 +227,7 @@ public abstract class AbstractCommand extends BaseInstance implements CliCommand
     }
 
     @Override
-    public int compareTo(CliCommand other) {
-        if (other == null) {
-            return 1;
-        }
-
-        // by group
-        val byGroup = getGroup().compareTo(other.getGroup());
-        if (byGroup != 0) {
-            return byGroup;
-        }
-
-        // by name
-        return getName().compareTo(other.getName());
+    public final int compareTo(CliCommand other) {
+        return COMPARATOR.compare(this, other);
     }
 }

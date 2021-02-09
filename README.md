@@ -1,5 +1,8 @@
 # tsc4j
-=======
+
+![CI](https://github.com/tsc4j/tsc4j/workflows/Java%20CI/badge.svg)
+[![codecov](https://codecov.io/gh/tsc4j/tsc4j/branch/main/graph/badge.svg?token=78FQI7NZUE)](https://codecov.io/gh/tsc4j/tsc4j)
+
 # typesafe-config-addons
 
 # Building

@@ -6,6 +6,8 @@ plugins {
   id "com.gorylenko.gradle-git-properties"
 }
 
+description = "tsc4j CORE implementation"
+
 dependencies {
   api                     project(":tsc4j-api")
   api                     "org.slf4j:slf4j-api"
@@ -40,6 +42,9 @@ gitProperties {
 
   keys                = [ 'git.build.version', 'git.commit.id', 'git.commit.id.abbrev','git.commit.time' ]
 }
+
+description = "Core libraries and implementations"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
 
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

@@ -2,6 +2,9 @@
 // build.gradle
 //
 
+description = "Google Cloud Platform (GCP) integration"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencies {
   api                     project(":${rootProject.name}-core")
 

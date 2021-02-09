@@ -28,5 +28,8 @@ compileJava {
   options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
+description = "Amazon Web Services (AWS) integration via aws-java-sdk 1.x"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

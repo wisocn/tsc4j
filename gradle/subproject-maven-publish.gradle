@@ -35,11 +35,19 @@ publishing {
       }
 
       // javadoc jar
-      if (isJavadocPublishingEnabled() && tasks.findByName("javadocJar")) {
+      if (isJavadocPublishingEnabled()) {
         artifact javadocJar
       }
     }
   }
+}
+
+apply from: "${rootDir}/gradle/subproject-pom-info.gradle"
+
+artifacts {
+  archives jar
+  archives sourcesJar
+  archives javadocJar
 }
 
 // vim:shiftwidth=2 softtabstop=2 expandtab

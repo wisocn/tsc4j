@@ -56,7 +56,7 @@ jobs:
              ~/.gradle/caches
              ~/.gradle/wrapper
              ~/.cache/google-cloud-tools-java
-          key: gradle-${{ hashFiles('build.gradle') }}
+          key: gradle-${{ hashFiles('build.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 

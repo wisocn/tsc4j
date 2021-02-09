@@ -2,6 +2,9 @@
 // build.gradle
 //
 
+description = "Google Guice integration"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencyManagement {
   imports {
     mavenBom "com.google.inject:guice-bom:${guiceVersion}"

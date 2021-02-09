@@ -9,7 +9,15 @@ ext.sysPropOrEnvVar = { String propName, String defaultVal = '' ->
 }
 
 ext.isJavadocPublishingEnabled = {
-  Boolean.parseBoolean(sysPropOrEnvVar('javadoc.enabled', 'true'))
+  def sysPropEnabled = Boolean.parseBoolean(sysPropOrEnvVar('javadoc.enabled', 'true'))
+  def javadocBlockEnabled = javadoc?.enabled ?: false
+  def hasJavadocTask = tasks.findByName("javadocJar") != null
+
+  def result = sysPropEnabled && javadocBlockEnabled && hasJavadocTask
+
+  // println("[${project.name}] javadoc publishing: enabled: $sysPropEnabled/$javadocBlockEnabled/$hasJavadocTask [$result]")
+
+  result
 }
 
 // vim:shiftwidth=2 softtabstop=2 expandtab

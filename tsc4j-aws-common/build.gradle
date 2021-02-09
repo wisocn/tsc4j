@@ -11,5 +11,8 @@ dependencies {
   testImplementation      project(path: ":${rootProject.name}-core", configuration: "testOutput")
 }
 
+description = "Amazon Web Services (AWS) integration commons"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 // vim:shiftwidth=2 softtabstop=2 expandtab
 // EOF

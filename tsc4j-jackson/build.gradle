@@ -2,6 +2,9 @@
 // build.gradle
 //
 
+description = "Jackson bean mapper implementation"
+publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
+
 dependencies {
   api                     project(":${rootProject.name}-core")
   api                     "com.fasterxml.jackson.core:jackson-databind"

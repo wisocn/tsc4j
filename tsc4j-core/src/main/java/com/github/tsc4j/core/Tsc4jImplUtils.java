@@ -344,6 +344,7 @@ public class Tsc4jImplUtils {
     public boolean close(AutoCloseable closeable, @NonNull Logger log) {
         if (closeable != null) {
             try {
+                log.debug("closing: {}", closeable);
                 closeable.close();
                 return true;
             } catch (Exception e) {

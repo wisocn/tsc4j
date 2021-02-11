@@ -19,6 +19,7 @@ package com.github.tsc4j.spring;
 import com.github.tsc4j.api.ReloadableConfig;
 import com.typesafe.config.Config;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +36,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 
-import java.util.Objects;
-import java.util.stream.StreamSupport;
+import javax.annotation.PreDestroy;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Tsc4j configuration class.
@@ -44,6 +46,14 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @Configuration
 public class Tsc4jConfiguration {
+//    @Lazy(value = false)
+//    @Bean(destroyMethod = "close")
+//    @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+//    @Named(ATOMIC_INSTANCE_NAME)
+//    AtomicInstance<CloseableReloadableConfig> reloadableConfigAtomicInstance() {
+//        return new AtomicInstance<>(CloseableReloadableConfig::close);
+//    }
+
     /**
      * Provides reloadable config singleton.
      *
@@ -54,7 +64,19 @@ public class Tsc4jConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ReloadableConfig reloadableConfig(@NonNull @Value("${spring.application.name}") String appName,
                                              @NonNull Environment env) {
-        val rc = SpringUtils.getOrCreateReloadableConfig(appName, env);
+        //@NonNull @Named(ATOMIC_INSTANCE_NAME) AtomicInstance<CloseableReloadableConfig> instanceHolder) {
+        val rc = SpringUtils.rcInstanceHolder().getOrCreate(
+            () -> SpringUtils.createReloadableConfig(appName, SpringUtils.getTsc4jEnvs(env)));
+//        val rc = SpringUtils.getOrCreateReloadableConfig(appName, env);
+
+        // fetch config
+        rc.getSync();
+
+        // hopeless case...
+        if (env instanceof ConfigurableEnvironment) {
+            tsc4jPropertySource(rc, (ConfigurableEnvironment) env);
+        }
+
         log.debug("supplying reloadable config singleton: {}", rc);
         return rc;
     }
@@ -82,42 +104,71 @@ public class Tsc4jConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     @ConditionalOnMissingBean
+    @SneakyThrows
     Tsc4jPropertySource tsc4jPropertySource(@NonNull ReloadableConfig reloadableConfig,
                                             @NonNull ConfigurableEnvironment env) {
-        val source = new Tsc4jPropertySource(reloadableConfig);
+        Tsc4jPropertySource propSource = findTsc4jPropSource(env)
+            .orElseGet(() -> createAndRegisterTsc4jPropertySource(reloadableConfig, env));
 
-        // if environment doesn't contain this source, add it.
-        if (!containsTsc4jSource(env)) {
-            env.getPropertySources().addLast(source);
-            log.debug("added {} configuration source to spring configurable environment: {}", source, env);
-        }
+        debugSpringEnvPropSources(env);
 
-        log.debug("supplying tsc4j property source: {}", source);
-        return source;
+        log.debug("supplying tsc4j property source: {}", propSource);
+        return propSource;
+
     }
 
-    private boolean containsTsc4jSource(@NonNull ConfigurableEnvironment env) {
+    private Tsc4jPropertySource createAndRegisterTsc4jPropertySource(ReloadableConfig reloadableConfig,
+                                                                     ConfigurableEnvironment env) {
+        val propertySource = new Tsc4jPropertySource(reloadableConfig);
+        log.debug("{} created tsc4j spring property source: {}", propertySource);
+
+        // register created property source to spring environment
+        env.getPropertySources().addLast(propertySource);
+
+        return propertySource;
+    }
+
+    private Optional<Tsc4jPropertySource> findTsc4jPropSource(@NonNull ConfigurableEnvironment env) {
+        debugSpringEnvPropSources(env);
         val sources = env.getPropertySources();
-        if (log.isDebugEnabled()) {
-            log.debug("configurable environment contains {} property sources.", sources.size());
-            sources.forEach(e -> log.debug("  name: '{}' -> {}", e.getName(), e));
-        }
-        val found = StreamSupport.stream(sources.spliterator(), false)
-            .filter(Objects::nonNull)
+        val tsc4jPropSourceOpt = sources.stream()
+            .flatMap(this::expandPropertySources)
             .filter(this::isTsc4jPropertySource)
-            .findAny();
-        log.debug("spring configurable environment contains tsc4j: {}", found.isPresent());
-        return found.isPresent();
+            .map(it -> (Tsc4jPropertySource) it)
+            .findFirst();
+        log.debug("spring configurable environment contains tsc4j property source: {}", tsc4jPropSourceOpt);
+        return tsc4jPropSourceOpt;
+    }
+
+    private Stream<PropertySource<?>> expandPropertySources(PropertySource<?> source) {
+        if (source == null) {
+            return Stream.empty();
+        }
+
+        if (source instanceof CompositePropertySource) {
+            val composite = (CompositePropertySource) source;
+            return composite.getPropertySources().stream();
+        }
+
+        return Stream.of(source);
     }
 
     private boolean isTsc4jPropertySource(PropertySource<?> source) {
-        if (source == null) {
-            return false;
-        }
-        if (source instanceof CompositePropertySource) {
-            val composite = (CompositePropertySource) source;
-            return composite.getPropertySources().stream().anyMatch(this::isTsc4jPropertySource);
-        }
         return source instanceof Tsc4jPropertySource;
+    }
+
+    private void debugSpringEnvPropSources(ConfigurableEnvironment env) {
+        if (log.isDebugEnabled()) {
+            val sources = env.getPropertySources();
+            val sb = new StringBuilder();
+            sources.forEach(it -> sb.append("  name: '" + it.getName() + "' -> " + it + "\n"));
+            log.debug("{} spring configurable environment contains {} property sources:\n  {}",
+                this, sources.size(), sb);
+        }
+    }
+
+    @PreDestroy
+    void close() {
+        SpringUtils.rcInstanceHolder().close();
     }
 }

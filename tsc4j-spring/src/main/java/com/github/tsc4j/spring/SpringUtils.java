@@ -16,7 +16,8 @@
 
 package com.github.tsc4j.spring;
 
-import com.github.tsc4j.api.ReloadableConfig;
+import com.github.tsc4j.core.AtomicInstance;
+import com.github.tsc4j.core.CloseableReloadableConfig;
 import com.github.tsc4j.core.ReloadableConfigFactory;
 import com.github.tsc4j.core.Tsc4jImplUtils;
 import lombok.NonNull;
@@ -37,7 +38,8 @@ import java.util.List;
 @Slf4j
 @UtilityClass
 class SpringUtils {
-    private static volatile ReloadableConfig reloadableConfig;
+    private static final AtomicInstance<CloseableReloadableConfig> instanceHolder =
+        new AtomicInstance<>(CloseableReloadableConfig::close);
 
     /**
      * Translates active spring profiles from the environment to unique list of tsc4j env names.
@@ -58,45 +60,20 @@ class SpringUtils {
         return Collections.unmodifiableList(profiles);
     }
 
-    /**
-     * Creates reloadable configuration singleton if it does not exist, otherwise returns already created singleton.
-     *
-     * @param appName application name
-     * @param env     spring environment
-     * @return reloadable config
-     * @throws NullPointerException in case of null arguments
-     * @throws RuntimeException     in case of reloadable config creation errors
-     */
-    ReloadableConfig getOrCreateReloadableConfig(@NonNull String appName,
-                                                 @NonNull Environment env) {
-        return getOrCreateReloadableConfig(appName, getTsc4jEnvs(env));
+    CloseableReloadableConfig createReloadableConfig(@NonNull String appName, @NonNull Collection<String> envs) {
+        // create rc, but spring doesn't have notion of running datacenter name
+        val rc = ReloadableConfigFactory.defaults()
+            .setAppName(appName)
+            .setEnvs(new ArrayList<>(envs))
+            .create();
+        log.debug("created reloadable config instance: {}", rc);
+        val config = rc.getSync();
+        log.trace("fetched initial config: {}", config);
+
+        return rc;
     }
 
-    /**
-     * Creates reloadable configuration singleton if it does not exist, otherwise returns already created singleton.
-     *
-     * @param appName application name
-     * @param envs    application running environments
-     * @return reloadable config
-     * @throws NullPointerException in case of null arguments
-     * @throws RuntimeException     in case of reloadable config creation errors
-     */
-    ReloadableConfig getOrCreateReloadableConfig(@NonNull String appName,
-                                                 @NonNull Collection<String> envs) {
-        if (reloadableConfig == null) {
-            synchronized (Tsc4jConfiguration.class) {
-                if (reloadableConfig == null) {
-                    // create rc, but spring doesn't have notion of running datacenter name
-                    reloadableConfig = ReloadableConfigFactory.defaults()
-                        .setAppName(appName)
-                        .setEnvs(new ArrayList<>(envs))
-                        .create();
-                    log.debug("created reloadable config instance: {}", reloadableConfig);
-                    val config = reloadableConfig.getSync();
-                    log.trace("fetched initial config: {}", config);
-                }
-            }
-        }
-        return reloadableConfig;
+    AtomicInstance<CloseableReloadableConfig> rcInstanceHolder() {
+        return instanceHolder;
     }
 }

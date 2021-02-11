@@ -18,10 +18,12 @@
 package com.github.tsc4j.spring
 
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 @ActiveProfiles(["test", "funky"])
 @SpringBootTest(classes = SampleApp)
+@DirtiesContext
 abstract class SpringSpec extends Specification {
 }

@@ -16,6 +16,7 @@
 
 package com.github.tsc4j.spring;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import javax.annotation.PreDestroy;
 import java.util.Objects;
 
 /**
@@ -52,11 +55,17 @@ public class Tsc4jBootstrapConfiguration {
     @Bean
     @ConditionalOnMissingBean(Tsc4jPropertySourceLocator.class)
     @ConditionalOnProperty(value = Constants.PROPERTY_ENABLED, matchIfMissing = true)
-    public PropertySourceLocator tsc4jPropertySourceLocator(@Value("${spring.application.name}") String appName) {
+    public PropertySourceLocator tsc4jPropertySourceLocator(@Value("${spring.application.name}") String appName,
+                                                            @NonNull ApplicationContext appCtx) {
         val env = Objects.requireNonNull(environment, "spring application environment must be injected.");
         log.debug("creating source locator: '{}' with env: {}", appName, env);
         val locator = new Tsc4jPropertySourceLocator(appName, env);
         log.debug("created spring property source locator for app name {}: {}", appName, locator);
         return locator;
+    }
+
+    @PreDestroy
+    void close() {
+        SpringUtils.rcInstanceHolder().close();
     }
 }

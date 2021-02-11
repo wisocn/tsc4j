@@ -1591,7 +1591,7 @@ public class Tsc4jImplUtils {
         val tmpResult = (config.hasPath(configPath)) ? config.getAnyRef(configPath) : null;
         val result = doGetResult(name, tmpResult);
 
-        log.trace("getProperty(name: '{}', path: '{}'): '{}'", name, configPath, result);
+        log.trace("getPropertyFromConfig(name: '{}', path: '{}'): {} -> '{}'", name, configPath, tmpResult, result);
         return result;
     }
 

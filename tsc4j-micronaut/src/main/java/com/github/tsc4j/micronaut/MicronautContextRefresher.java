@@ -40,7 +40,7 @@ import java.util.function.Function;
 @Context
 @Singleton
 @Requires(beans = Tsc4jPropertySource.class)
-@Requires(property = "tsc4j.micronaut.refresh", defaultValue = "true")
+@Requires(property = "tsc4j.micronaut.refresh.enabled", value = "true", defaultValue = "false")
 public final class MicronautContextRefresher extends CloseableInstance {
     private final Reloadable<Config> reloadable;
     private final ApplicationContext ctx;

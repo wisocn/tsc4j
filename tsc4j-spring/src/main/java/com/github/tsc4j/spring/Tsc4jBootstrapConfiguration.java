@@ -66,6 +66,6 @@ public class Tsc4jBootstrapConfiguration {
 
     @PreDestroy
     void close() {
-        SpringUtils.rcInstanceHolder().close();
+        SpringUtils.instanceHolder().close();
     }
 }

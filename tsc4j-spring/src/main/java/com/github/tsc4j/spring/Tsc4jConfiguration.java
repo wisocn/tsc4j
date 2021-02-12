@@ -64,7 +64,7 @@ public class Tsc4jConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ReloadableConfig reloadableConfig(@NonNull @Value("${spring.application.name}") String appName,
                                              @NonNull Environment env) {
-        val rc = SpringUtils.rcInstanceHolder().getOrCreate(
+        val rc = SpringUtils.instanceHolder().getOrCreate(
             () -> SpringUtils.createReloadableConfig(appName, SpringUtils.getTsc4jEnvs(env)));
 
         // fetch config
@@ -167,6 +167,6 @@ public class Tsc4jConfiguration {
 
     @PreDestroy
     void close() {
-        SpringUtils.rcInstanceHolder().close();
+        SpringUtils.instanceHolder().close();
     }
 }

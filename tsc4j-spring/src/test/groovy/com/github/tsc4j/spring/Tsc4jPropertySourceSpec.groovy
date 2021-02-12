@@ -43,6 +43,14 @@ class Tsc4jPropertySourceSpec extends Specification {
 
     def expectedPropertyNames = ['id', 'bar', 'a', 'b', 'foo.bar', 'foo.list', 'foo.list[0]', 'foo.list[1]', 'foo.list[2]']
 
+    def setupSpec() {
+        cleanupSpec()
+    }
+
+    def cleanupSpec() {
+        SpringUtils.instanceHolder().close()
+    }
+
     Tsc4jPropertySource newSource() {
         reloadableConfig.getSync() >> config
         reloadableConfig.register(_) >> reloadable

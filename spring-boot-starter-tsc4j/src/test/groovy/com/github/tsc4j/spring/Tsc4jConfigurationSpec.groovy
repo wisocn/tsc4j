@@ -33,6 +33,10 @@ class Tsc4jConfigurationSpec extends SpringSpec {
     @Inject
     Config config
 
+    def cleanupSpec() {
+        SpringUtils.instanceHolder().close()
+    }
+
     def 'context should be wired'() {
         expect:
         ctx != null

@@ -26,6 +26,14 @@ class Tsc4jPropertySourceLocatorSpec extends Specification {
     def configurableEnv = Mock(ConfigurableEnvironment)
     def locator = new Tsc4jPropertySourceLocator(appName, configurableEnv)
 
+    def setupSpec() {
+        cleanupSpec()
+    }
+
+    def cleanupSpec() {
+        SpringUtils.instanceHolder().close()
+    }
+
     def "locate() should return property source"() {
         given:
         def env = Mock(Environment)

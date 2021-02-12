@@ -64,7 +64,7 @@ class Tsc4jPropertySourceLocator implements PropertySourceLocator {
             appName, envNames);
 
         log.trace("locate(): creating reloadable config.");
-        val reloadableConfig = SpringUtils.rcInstanceHolder().getOrCreate(
+        val reloadableConfig = SpringUtils.instanceHolder().getOrCreate(
             () -> SpringUtils.createReloadableConfig(appName, SpringUtils.getTsc4jEnvs(env)));
         log.debug("locate(): created reloadable config: {}", reloadableConfig);
 

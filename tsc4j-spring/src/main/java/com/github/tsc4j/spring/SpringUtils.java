@@ -73,7 +73,12 @@ class SpringUtils {
         return rc;
     }
 
-    AtomicInstance<CloseableReloadableConfig> rcInstanceHolder() {
+    /**
+     * Atomic {@link com.github.tsc4j.api.ReloadableConfig} instance holder.
+     *
+     * @return atomic instance.
+     */
+    AtomicInstance<CloseableReloadableConfig> instanceHolder() {
         return instanceHolder;
     }
 }

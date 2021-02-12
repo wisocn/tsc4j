@@ -40,6 +40,14 @@ class SpringAppSpec extends SpringSpec {
     @Autowired
     Tsc4jHealthIndicator healthIndicator
 
+    def setupSpec() {
+        cleanupSpec()
+    }
+
+    def cleanupSpec() {
+        SpringUtils.instanceHolder().close()
+    }
+
     def "context should be wired"() {
         expect:
         ctx != null
@@ -59,7 +67,7 @@ class SpringAppSpec extends SpringSpec {
 
         then:
         verifyAll {
-            name == "mySuperFunkyApp"
+            name == "appNameFromAppYml"
             ctx.getEnvironment().getProperty('app.var2', Integer) == 42
             ctx.getEnvironment().getProperty("app.var3") == "overriden in funky/application.conf: " + name
         }
@@ -70,7 +78,9 @@ class SpringAppSpec extends SpringSpec {
         def prefix = "test.bean."
 
         when:
+        log.info("asking for environment")
         def env = ctx.getEnvironment()
+        log.info("got environment, asking for props")
 
         then:
         env.getProperty("${prefix}aBoolean") == "true"

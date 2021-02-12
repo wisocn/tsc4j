@@ -50,6 +50,7 @@ class SampleApp {
 
     @PostConstruct
     void init() {
+        log.info("{} init()", this)
         log.info("Using reloadable config: {}", reloadableConfig)
         log.info("Using config:            {}", config)
         log.info("configs are the same:    {}", config == reloadableConfig.getSync())
@@ -57,8 +58,11 @@ class SampleApp {
         log.info("config:         {}", config)
         log.info("my service:     {}", myService)
         //log.info("my config:      {}", myService.myconfigReloadable.get())
+
+        log.info("{} init() done", this)
     }
 
+    @Slf4j
     @Service
     @ToString(includePackage = false, includeNames = true)
     class MyService {
@@ -76,6 +80,7 @@ class SampleApp {
                   @Value('${spring.application.name}') String appName) {
             this.myconfigReloadable = myConfigReloadable
             this.appName = appName
+            log.info("{} instantiating.", this)
         }
 
         def setBool(Boolean b) {

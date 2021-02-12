@@ -33,7 +33,7 @@
   <!--logger name="com.github.tsc4j.core.impl.Rot13ConfigTransformer" level="DEBUG" /-->
   <!--logger name="com.github.tsc4j.core.impl.TscBeanFactory" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.ConfigImplUtils" level="TRACE" /-->
-  <!--logger name="com.github.tsc4j.core.impl.ClasspathConfigSource" level="TRACE" /-->
+  <logger name="com.github.tsc4j.core.impl.ClasspathConfigSource" level="TRACE" />
   <!--logger name="com.github.tsc4j.core.tsc4j" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.credstash" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.FilesConfigSource" level="TRACE" /-->
@@ -55,12 +55,18 @@
 
   <!-- gcp stuff -->
   <logger name="com.github.tsc4j.gcp" level="TRACE" />
-  <logger name="com.github.tsc4j.spring" level="DEBUG" />
   <!--logger name="com.github.tsc4j.core.impl.ConfigValueProviderConfigTransformer" level="DEBUG" /-->
+
+  <!--spring stuff -->
+  <logger name="com.github.tsc4j.spring" level="TRACE" />
+  <logger name="com.github.tsc4j.core.Tsc4jImplUtils" level="TRACE" />
 
   <!--logger name="io.micronaut" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.micronaut.Tsc4jPropertySource" level="TRACE" /-->
   <!--logger name="io.micronaut.context.env.DefaultEnvironment" level="TRACE" /-->
+
+  <!-- micronaut stuff -->
+  <!--logger name="com.github.tsc4j.micronaut2.Tsc4jPropertySourceLoader" level="TRACE" /-->
 
   <!--logger name="org.apache" level="TRACE" additivity="false">
     <appender-ref ref="wireDebug"/>

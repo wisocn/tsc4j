@@ -86,7 +86,12 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
 
         this.currentPropertyNames = Tsc4jImplUtils.propertyNames(config);
         this.currentConfig = config;
-        log.debug("{} assigned new config object: {}", this, config);
+
+        if (log.isDebugEnabled()) {
+            log.trace("{} assigned new config object: {}", this, config);
+            log.debug("{} assigned new property names ({}): {}",
+                this, currentPropertyNames.size(), currentPropertyNames);
+        }
     }
 
     @Override
@@ -96,16 +101,23 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
         if (idx > 0) {
             name = name.substring(0, idx);
         }
-        val result = currentPropertyNames.contains(name);
-        log.debug("{} contains config property '{}': {}", this, name, result);
+
+        val cleanName = (idx > 0) ? name.substring(0, idx) : name;
+
+        val result = currentPropertyNames.contains(cleanName);
+        log.debug("{} containsProperty() '{}/{}': {}", this, name, cleanName, result);
         return result;
     }
 
     @Override
     public String[] getPropertyNames() {
         waitForConfigFetch();
-        val result = currentPropertyNames.toArray(new String[0]);
-        log.trace("{} retrieving current property names ({} names)", this, result.length);
+        val names = currentPropertyNames;
+        val result = names.toArray(new String[0]);
+        if (log.isDebugEnabled()) {
+            log.debug("{} retrieving current property name array ({} entries)", this, names.size());
+            log.trace("{} retrieving current property names: {}", this, names);
+        }
         return result;
     }
 

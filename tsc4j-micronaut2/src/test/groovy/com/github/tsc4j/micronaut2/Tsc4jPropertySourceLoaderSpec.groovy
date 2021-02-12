@@ -15,8 +15,9 @@
  *
  */
 
-package com.github.tsc4j.micronaut
+package com.github.tsc4j.micronaut2
 
+import io.micronaut.context.env.ActiveEnvironment
 import io.micronaut.context.env.Environment
 import io.micronaut.context.env.PropertySource
 import io.micronaut.core.io.ResourceLoader
@@ -45,6 +46,7 @@ class Tsc4jPropertySourceLoaderSpec extends Specification {
         given:
         def resourceLoader = Mock(ResourceLoader)
         def env = Mock(Environment)
+        def activeEnv = ActiveEnvironment.of(envName, 0)
 
         when:
         true
@@ -53,8 +55,8 @@ class Tsc4jPropertySourceLoaderSpec extends Specification {
         0 * env._
         0 * resourceLoader._
 
-        !loader.load(resourceName, resourceLoader, envName).isPresent()
-        !loader.load(resourceName, env, envName).isPresent()
+        !loader.load(resourceName, resourceLoader).isPresent()
+        !loader.loadEnv(resourceName, env, activeEnv).isPresent()
 
         where:
         [resourceName, envName] << [
@@ -75,10 +77,10 @@ class Tsc4jPropertySourceLoaderSpec extends Specification {
         loader.close()
 
         expect: "should empty optional if asked for bootstrap name"
-        envNames.each { assert !loader.load(Environment.BOOTSTRAP_NAME, env, it).isPresent() }
+        envNames.each { assert !loader.loadEnv(Environment.BOOTSTRAP_NAME, env, ActiveEnvironment.of(it, 0)).isPresent() }
 
         when:
-        def results = envNames.collect { loader.load(Environment.DEFAULT_NAME, env, it) }
+        def results = envNames.collect { loader.loadEnv(Environment.DEFAULT_NAME, env, ActiveEnvironment.of(it, 0)) }
 
         then:
         results.each { assert it.isPresent() }

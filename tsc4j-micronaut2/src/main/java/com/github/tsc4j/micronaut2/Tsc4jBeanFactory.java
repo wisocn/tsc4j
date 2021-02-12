@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.micronaut;
+package com.github.tsc4j.micronaut2;
 
 import com.github.tsc4j.api.ReloadableConfig;
 import com.typesafe.config.Config;

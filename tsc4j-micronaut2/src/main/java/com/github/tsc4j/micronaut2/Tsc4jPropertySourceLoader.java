@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.micronaut;
+package com.github.tsc4j.micronaut2;
 
 import com.github.tsc4j.core.CloseableInstance;
 import com.github.tsc4j.core.CloseableReloadableConfig;
 import com.github.tsc4j.core.Pair;
 import com.github.tsc4j.core.ReloadableConfigFactory;
 import com.github.tsc4j.core.Tsc4jImplUtils;
+import io.micronaut.context.env.ActiveEnvironment;
 import io.micronaut.context.env.Environment;
 import io.micronaut.context.env.PropertySource;
 import io.micronaut.context.env.PropertySourceLoader;
@@ -33,7 +34,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -48,10 +48,11 @@ import java.util.Optional;
 @Singleton
 public final class Tsc4jPropertySourceLoader extends CloseableInstance
     implements PropertySourceLoader, Toggleable, Ordered {
-    static final int ORDER_POSITION = SystemPropertiesPropertySource.POSITION + 10_000;
 
+    static final int ORDER_POSITION = SystemPropertiesPropertySource.POSITION + 10_000;
     static final String DEFAULT_APP_NAME = "micronaut-application";
     static final String DEFAULT_DATACENTER_NAME = "default";
+    private static final ActiveEnvironment DEFAULT_ACTIVE_ENV = ActiveEnvironment.of("default-active-env", 0);
 
     @Override
     public int getOrder() {
@@ -60,22 +61,30 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
 
     @Override
     public Map<String, Object> read(String name, InputStream input) {
-        log.warn("invoked non-implemented read(name, stream)", name, input, new RuntimeException("Stacktrace"));
+        log.warn("invoked non-implemented read(name, inputStream): {} {}",
+            name, input, new RuntimeException("Stacktrace"));
         return Collections.emptyMap();
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public Optional<PropertySource> load(@NonNull String resourceName,
-                                         @NonNull ResourceLoader resourceLoader,
-                                         @Nullable String environmentName) {
-        log.trace("{} resource name: {}, loader: {}, env: {}", this, resourceName, resourceLoader, environmentName);
+    public Optional<PropertySource> load(String resourceName, ResourceLoader resourceLoader) {
+        return loadEnv(resourceName, resourceLoader, DEFAULT_ACTIVE_ENV);
+    }
+
+    @Override
+    public Optional<PropertySource> loadEnv(String resourceName,
+                                            ResourceLoader resourceLoader,
+                                            ActiveEnvironment activeEnvironment) {
         if (!resourceName.equals(Environment.DEFAULT_NAME)) {
+            log.debug("{} refusing to return PropertySource for resource name {}, returning empty optional.",
+                this, resourceName);
             return Optional.empty();
         }
 
-        log.debug("{} resource name: {}, loader: {}, env: {}", this, resourceName, resourceLoader, environmentName);
         if (resourceLoader instanceof Environment) {
+            log.debug("{} will return tsc4j property source for resource name {}, loader: {}, env: {}",
+                this, resourceName, resourceLoader, activeEnvironment.getName());
+
             val env = (Environment) resourceLoader;
             val propertySource = Utils.instanceHolder()
                 .getOrCreate(() -> instanceHolderCreator(env))
@@ -83,7 +92,14 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
             return Optional.ofNullable(propertySource);
         }
 
+        log.debug("{} resource loader {} is not instance of micronaut Environment, returning empty optional.",
+            this, resourceLoader);
         return Optional.empty();
+    }
+
+    @Override
+    protected void doClose() {
+        Utils.instanceHolder().close();
     }
 
     private Pair<CloseableReloadableConfig, Tsc4jPropertySource> instanceHolderCreator(@NonNull Environment env) {
@@ -123,11 +139,6 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
         return Optional.ofNullable(source.get(ApplicationConfiguration.APPLICATION_NAME))
             .map(Object::toString)
             .flatMap(Tsc4jImplUtils::optString);
-    }
-
-    @Override
-    protected void doClose() {
-        Utils.instanceHolder().close();
     }
 
     @Override

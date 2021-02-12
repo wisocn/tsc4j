@@ -43,7 +43,10 @@ public class Tsc4jBeanFactory {
     @Singleton
     @Context
     public ReloadableConfig reloadableConfig() {
-        val rc = Tsc4jPropertySourceLoader.getReloadableConfig();
+        val rc = Utils.instanceHolder()
+            .get()
+            .orElseThrow(() -> new IllegalStateException("ReloadableConfig instance has not been initialized."))
+            .first();
 
         // wait for config fetch to complete.
         rc.getSync();

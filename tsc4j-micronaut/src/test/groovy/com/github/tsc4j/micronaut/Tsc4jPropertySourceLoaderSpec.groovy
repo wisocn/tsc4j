@@ -30,7 +30,7 @@ class Tsc4jPropertySourceLoaderSpec extends Specification {
     def loader = new Tsc4jPropertySourceLoader()
 
     def cleanupSpec() {
-        Tsc4jPropertySourceLoader.cleanup()
+        Utils.instanceHolder().close()
     }
 
     def "should return expected values"() {

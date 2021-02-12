@@ -64,10 +64,8 @@ public class Tsc4jConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ReloadableConfig reloadableConfig(@NonNull @Value("${spring.application.name}") String appName,
                                              @NonNull Environment env) {
-        //@NonNull @Named(ATOMIC_INSTANCE_NAME) AtomicInstance<CloseableReloadableConfig> instanceHolder) {
         val rc = SpringUtils.rcInstanceHolder().getOrCreate(
             () -> SpringUtils.createReloadableConfig(appName, SpringUtils.getTsc4jEnvs(env)));
-//        val rc = SpringUtils.getOrCreateReloadableConfig(appName, env);
 
         // fetch config
         rc.getSync();
@@ -120,7 +118,7 @@ public class Tsc4jConfiguration {
     private Tsc4jPropertySource createAndRegisterTsc4jPropertySource(ReloadableConfig reloadableConfig,
                                                                      ConfigurableEnvironment env) {
         val propertySource = new Tsc4jPropertySource(reloadableConfig);
-        log.debug("{} created tsc4j spring property source: {}", propertySource);
+        log.debug("{} created tsc4j spring property source: {}", this, propertySource);
 
         // register created property source to spring environment
         env.getPropertySources().addLast(propertySource);

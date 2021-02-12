@@ -16,8 +16,6 @@
 
 package com.github.tsc4j.micronaut2;
 
-import com.github.tsc4j.api.ReloadableConfig;
-import com.github.tsc4j.core.AtomicInstance;
 import com.github.tsc4j.core.CloseableInstance;
 import com.github.tsc4j.core.CloseableReloadableConfig;
 import com.github.tsc4j.core.Pair;
@@ -33,7 +31,6 @@ import io.micronaut.core.order.Ordered;
 import io.micronaut.core.util.Toggleable;
 import io.micronaut.runtime.ApplicationConfiguration;
 import lombok.NonNull;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -57,33 +54,6 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
     static final String DEFAULT_DATACENTER_NAME = "default";
     private static final ActiveEnvironment DEFAULT_ACTIVE_ENV = ActiveEnvironment.of("default-active-env", 0);
 
-    /**
-     * Reloadable config holder.
-     */
-    private static final AtomicInstance<Pair<CloseableReloadableConfig, Tsc4jPropertySource>> instanceHolder =
-        new AtomicInstance<>(Tsc4jPropertySourceLoader::instanceHolderDestroyer);
-
-    /**
-     * Returns reloadable config.
-     *
-     * @return reloadable config
-     * @throws IllegalStateException if reloadable config is not set
-     */
-    @Synchronized
-    static ReloadableConfig getReloadableConfig() {
-        return instanceHolder.get()
-            .orElseThrow(() -> new IllegalStateException("ReloadableConfig instance has not been initialized."))
-            .first();
-    }
-
-    /**
-     * Cleans up instance
-     */
-    @Synchronized
-    static void cleanup() {
-        instanceHolder.close();
-    }
-
     @Override
     public int getOrder() {
         return ORDER_POSITION;
@@ -91,7 +61,8 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
 
     @Override
     public Map<String, Object> read(String name, InputStream input) {
-        log.warn("invoked non-implemented read(name, inputStream)", name, input, new RuntimeException("Stacktrace"));
+        log.warn("invoked non-implemented read(name, inputStream): {} {}",
+            name, input, new RuntimeException("Stacktrace"));
         return Collections.emptyMap();
     }
 
@@ -115,7 +86,7 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
                 this, resourceName, resourceLoader, activeEnvironment.getName());
 
             val env = (Environment) resourceLoader;
-            val propertySource = instanceHolder
+            val propertySource = Utils.instanceHolder()
                 .getOrCreate(() -> instanceHolderCreator(env))
                 .second();
             return Optional.ofNullable(propertySource);
@@ -128,7 +99,7 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
 
     @Override
     protected void doClose() {
-        instanceHolder.close();
+        Utils.instanceHolder().close();
     }
 
     private Pair<CloseableReloadableConfig, Tsc4jPropertySource> instanceHolderCreator(@NonNull Environment env) {
@@ -168,16 +139,6 @@ public final class Tsc4jPropertySourceLoader extends CloseableInstance
         return Optional.ofNullable(source.get(ApplicationConfiguration.APPLICATION_NAME))
             .map(Object::toString)
             .flatMap(Tsc4jImplUtils::optString);
-    }
-
-    private static void instanceHolderDestroyer(Pair<CloseableReloadableConfig, Tsc4jPropertySource> instancePair) {
-        // should not happen, but you never know
-        if (instancePair == null) {
-            return;
-        }
-
-        Tsc4jImplUtils.close(instancePair.second(), log);
-        Tsc4jImplUtils.close(instancePair.first(), log);
     }
 
     @Override

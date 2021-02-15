@@ -27,7 +27,6 @@ dependencies {
   testAnnotationProcessor "io.micronaut:micronaut-inject-groovy"
   testImplementation      "io.micronaut:micronaut-http-server-netty"
   testImplementation      "io.micronaut.test:micronaut-test-spock"
-  //testImplementation      "io.micronaut.test:micronaut-test-junit5"
   testImplementation      "io.micronaut:micronaut-inject-groovy"
 }
 

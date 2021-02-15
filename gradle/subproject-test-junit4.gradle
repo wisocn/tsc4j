@@ -1,0 +1,32 @@
+//
+// Gradle build fragment
+//
+
+// enable support for reproducible JAR archive builds
+// SEE: https://docs.gradle.org/3.5/userguide/working_with_files.html#sec:reproducible_archives
+
+// required for spock tests to execute successfuly
+// see: https://stackoverflow.com/questions/50681096/groovy-2-5-0-gives-noclassdeffounderror-for-methodcalltransformation
+ext['groovy.version'] = "${groovy2Version}"
+
+dependencyManagement {
+  imports {
+    mavenBom "org.spockframework:spock-bom:${spockVersion}"
+  }
+}
+
+dependencies {
+  testImplementation("org.codehaus.groovy:groovy-test") {
+    version { strictly "${groovyVersion}" }
+  }
+  testImplementation("org.codehaus.groovy:groovy") {
+    version { strictly "${groovyVersion}" }
+  }
+}
+
+test {
+  useJUnit()
+}
+
+// vim:shiftwidth=2 softtabstop=2 expandtab
+// EOF

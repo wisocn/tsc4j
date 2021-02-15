@@ -18,15 +18,15 @@
 package com.github.tsc4j.core.impl
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.github.tsc4j.core.AbstractConfigSource
 import com.github.tsc4j.core.AbstractConfigSourceSpec
 import com.github.tsc4j.core.ConfigQuery
 import com.github.tsc4j.core.ConfigSourceBuilder
 import com.github.tsc4j.core.Tsc4j
 import com.typesafe.config.ConfigFactory
+import de.mkammerer.wiremock.WireMockExtension
 import groovy.util.logging.Slf4j
-import org.junit.Rule
+import org.junit.jupiter.api.extension.RegisterExtension
 import spock.lang.Unroll
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
@@ -46,8 +46,19 @@ class URLConfigSourceSpec extends AbstractConfigSourceSpec {
 
     static def wiremockOpts = new WireMockConfiguration().port(PORT)
 
-    @Rule
-    WireMockRule wiremockRule = new WireMockRule(wiremockOpts, false)
+    @RegisterExtension
+    WireMockExtension wireMock = new WireMockExtension(PORT);
+
+    def setup() {
+        wireMock.start()
+    }
+
+    def cleanup() {
+        wireMock.stop()
+    }
+
+//    @Rule
+//    WireMockRule wiremockRule = new WireMockRule(wiremockOpts, false)
 
     def "should fetch correct urls and produce expected config"() {
         given:

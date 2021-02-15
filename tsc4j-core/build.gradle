@@ -14,7 +14,8 @@ dependencies {
 
   testImplementation      "org.slf4j:jcl-over-slf4j"
   testImplementation      "ch.qos.logback:logback-classic"
-  testImplementation      "com.github.tomakehurst:wiremock:2.18.0"
+  testImplementation      "com.github.tomakehurst:wiremock"
+  testImplementation      "de.mkammerer.wiremock-junit5:wiremock-junit5"
 }
 
 configurations {

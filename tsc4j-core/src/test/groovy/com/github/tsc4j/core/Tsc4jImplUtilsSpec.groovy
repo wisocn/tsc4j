@@ -652,7 +652,7 @@ class Tsc4jImplUtilsSpec extends Specification {
         def config = ConfigFactory.parseMap(cfgMap)
 
         when:
-        def opt = Tsc4jImplUtils.configVal(config, key, { cfg, key -> cfg.getString(key) })
+        def opt = Tsc4jImplUtils.configVal(config, key, { cfg, k -> cfg.getString(k) })
 
         then:
         opt.isPresent() == expected

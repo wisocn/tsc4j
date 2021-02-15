@@ -5,6 +5,12 @@
 description = "Google Cloud Platform (GCP) integration"
 publishing.publications.mavenJava.pom.description = rootProject.name + ' :: ' + description
 
+dependencyManagement {
+  imports {
+    mavenBom "com.google.cloud:google-cloud-bom:${googleCloudBomVersion}"
+  }
+}
+
 dependencies {
   api                     project(":${rootProject.name}-core")
 

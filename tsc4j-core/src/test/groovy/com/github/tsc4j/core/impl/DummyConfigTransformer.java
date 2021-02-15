@@ -59,9 +59,10 @@ public class DummyConfigTransformer extends AbstractConfigTransformer<Void> {
         }
 
         @Override
-        public Builder withConfig(Config config) {
-            configVal(config, "name", Config::getString).ifPresent(this::setBlah);
-            return super.withConfig(config);
+        public void withConfig(Config config) {
+            super.withConfig(config);
+
+            cfgString(config, "name", this::setBlah);
         }
 
 //        @Override

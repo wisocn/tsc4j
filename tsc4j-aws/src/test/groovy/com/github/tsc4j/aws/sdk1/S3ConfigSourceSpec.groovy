@@ -210,7 +210,11 @@ class S3ConfigSourceSpec extends FilesystemLikeConfigSourceSpec {
         builder << [
             builder().withPath("s3://x/y").setRegion("eu-central-1"),
             builder().withPath("s3://x/y").setRegion("eu-central-1"),
-            builder().withPath("s3://x/y").withConfig(ConfigFactory.parseMap(["region": "eu-central-1"])),
+            {
+                def b = builder().withPath("s3://x/y")
+                b.withConfig(ConfigFactory.parseMap(["region": "eu-central-1"]))
+                b
+            }.call(),
         ]
     }
 
@@ -231,8 +235,8 @@ class S3ConfigSourceSpec extends FilesystemLikeConfigSourceSpec {
         info.getRegion() == null
 
         when:
-        def res = this.builder().withConfig(config)
-        info = res.getAwsConfig()
+        builder.withConfig(config)
+        info = builder.getAwsConfig()
 
         then:
         info.getAccessKeyId() == map["access-key-id"]

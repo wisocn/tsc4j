@@ -49,9 +49,10 @@ class MyTransformer extends AbstractConfigTransformer {
         int someValue = -1
 
         @Override
-        Builder withConfig(@NonNull Config config) {
-            configVal(config, "someValue", { cfg, path -> cfg.getInt(path) }).ifPresent({ someValue = it })
-            return super.withConfig(config)
+        void withConfig(@NonNull Config config) {
+            super.withConfig(config)
+
+            cfgInt(config, "someValue", { someValue = it })
         }
 
         @Override

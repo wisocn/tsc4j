@@ -175,9 +175,10 @@ public final class EC2MetadataConfigSource extends AbstractConfigSource {
         private String atPath = DEFAULT_CFG_PATH;
 
         @Override
-        public Builder withConfig(@NonNull Config config) {
-            configVal(config, "at-path", Config::getString).ifPresent(this::setAtPath);
-            return super.withConfig(config);
+        public void withConfig(@NonNull Config config) {
+            super.withConfig(config);
+
+            cfgString(config, "at-path", this::setAtPath);
         }
 
         @Override

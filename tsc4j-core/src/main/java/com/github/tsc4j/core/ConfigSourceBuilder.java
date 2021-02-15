@@ -60,10 +60,10 @@ public abstract class ConfigSourceBuilder<T extends ConfigSourceBuilder<T>> exte
     }
 
     @Override
-    public T withConfig(Config config) {
-        configVal(config, "warn-on-missing", Config::getBoolean, this::setWarnOnMissing);
-        configVal(config, "fail-on-missing", Config::getBoolean, this::setFailOnMissing);
+    public void withConfig(Config config) {
+        super.withConfig(config);
 
-        return super.withConfig(config);
+        cfgBoolean(config, "warn-on-missing", this::setWarnOnMissing);
+        cfgBoolean(config, "fail-on-missing", this::setFailOnMissing);
     }
 }

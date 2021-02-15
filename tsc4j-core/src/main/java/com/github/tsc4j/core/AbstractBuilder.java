@@ -23,9 +23,6 @@ import lombok.NonNull;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 /**
  * Base class for writing builders.
@@ -33,7 +30,7 @@ import java.util.function.Consumer;
  * @param <T> builder type
  * @param <V> builder creation instance type
  */
-public abstract class AbstractBuilder<V, T extends AbstractBuilder<V, T>> implements WithConfig<T> {
+public abstract class AbstractBuilder<V, T extends AbstractBuilder<V, T>> implements WithConfig {
     /**
      * Built instance name.
      */
@@ -136,55 +133,11 @@ public abstract class AbstractBuilder<V, T extends AbstractBuilder<V, T>> implem
     }
 
     @Override
-    public T withConfig(@NonNull Config config) {
-        configVal(config, "name", Config::getString, this::setName);
-        configVal(config, "allow-errors", Config::getBoolean, this::setAllowErrors);
-        configVal(config, "parallel", Config::getBoolean, this::setParallel);
-        configVal(config, "cache-ttl", Config::getDuration, this::setCacheTtl);
-        return getThis();
-    }
-
-    /**
-     * Configures builder from {@link Config} object.<p/>
-     * <p>
-     * Example usage:<br/>
-     * {@code
-     * configVal(config, "some.path", Config::getString).ifPresent(this::setSomePath);
-     * }
-     *
-     * @param config    config object
-     * @param key       config path
-     * @param converter converter function that convers config at specified {@code key} to desired value type
-     * @param <E>       value type
-     * @return optional of converted value
-     * @see #withConfig(Config)
-     */
-    protected final <E> Optional<E> configVal(@NonNull Config config,
-                                              @NonNull String key,
-                                              @NonNull BiFunction<Config, String, E> converter) {
-        return Tsc4jImplUtils.configVal(config, key, converter);
-    }
-
-    /**
-     * Configures builder from {@link Config} object.<p/>
-     * <p>
-     * Example usage:<br/>
-     * {@code
-     * configVal(config, "some.path", Config::getString).ifPresent(this::setSomePath);
-     * }
-     *
-     * @param config    config object
-     * @param key       config path
-     * @param converter converter function that convers config at specified {@code key} to desired value type
-     * @param <E>       value type
-     * @return optional of converted value
-     * @see #withConfig(Config)
-     */
-    protected final <E> Optional<E> configVal(@NonNull Config config,
-                                              @NonNull String key,
-                                              @NonNull BiFunction<Config, String, E> converter,
-                                              @NonNull Consumer<E> consumer) {
-        return Tsc4jImplUtils.configVal(config, key, converter, consumer);
+    public void withConfig(@NonNull Config config) {
+        cfgString(config, "name", this::setName);
+        cfgBoolean(config, "allow-errors", this::setAllowErrors);
+        cfgBoolean(config, "parallel", this::setParallel);
+        cfgDuration(config, "cache-ttl", this::setCacheTtl);
     }
 
     /**

@@ -393,7 +393,9 @@ public class Tsc4j {
         log.debug("converting {} bootstrap config (resolved: {}): {}", Tsc4jImplUtils.NAME, config.isResolved(), config);
         try {
             val cfg = Tsc4j.resolveConfig(config);
-            val bootstrapConfig = Tsc4jConfig.builder().withConfig(cfg).build();
+            val builder = Tsc4jConfig.builder();
+            builder.withConfig(cfg);
+            val bootstrapConfig = builder.build();
             log.debug("created {} bootstrap config: {}", Tsc4jImplUtils.NAME, bootstrapConfig);
             return bootstrapConfig;
         } catch (Exception e) {

@@ -49,12 +49,11 @@ class Tsc4jConfigSpec extends Specification {
         def builder = Tsc4jConfig.builder()
 
         when:
-        def res = builder.withConfig(config)
+        builder.withConfig(config)
         def cfg = builder.build()
         log.warn("created instance: {}", cfg)
 
         then:
-        res.is(builder)
         assertInstance(cfg)
     }
 

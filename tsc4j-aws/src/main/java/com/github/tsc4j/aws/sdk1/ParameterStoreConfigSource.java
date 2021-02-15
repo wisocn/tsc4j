@@ -130,11 +130,11 @@ public final class ParameterStoreConfigSource extends AbstractConfigSource {
         }
 
         @Override
-        public Builder withConfig(@NonNull Config config) {
-            configVal(config, "paths", Config::getStringList).ifPresent(this::setPaths);
-            configVal(config, "at-path", Config::getString).ifPresent(this::setAtPath);
+        public void withConfig(@NonNull Config config) {
+            super.withConfig(config);
 
-            return super.withConfig(config);
+            cfgExtract(config, "paths", Config::getStringList, this::setPaths);
+            cfgString(config, "at-path", this::setAtPath);
         }
 
         @Override

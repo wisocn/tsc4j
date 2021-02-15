@@ -281,10 +281,11 @@ public final class GCSConfigSource
         private String credentialsString = null;
 
         @Override
-        public Builder withConfig(@NonNull Config config) {
-            configVal(config, "credentials-file", Config::getString).ifPresent(this::setCredentialsFile);
-            configVal(config, "credentials-string", Config::getString).ifPresent(this::setCredentialsString);
-            return super.withConfig(config);
+        public void withConfig(@NonNull Config config) {
+            super.withConfig(config);
+
+            cfgString(config, "credentials-file", this::setCredentialsFile);
+            cfgString(config, "credentials-string", this::setCredentialsString);
         }
 
         @Override

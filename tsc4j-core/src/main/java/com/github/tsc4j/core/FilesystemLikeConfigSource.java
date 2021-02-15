@@ -384,13 +384,14 @@ public abstract class FilesystemLikeConfigSource<T> extends AbstractConfigSource
         }
 
         @Override
-        public T withConfig(Config config) {
-            configVal(config, "confd-enabled", Config::getBoolean).ifPresent(this::setConfdEnabled);
-            configVal(config, "warn-on-missing-paths", Config::getBoolean).ifPresent(this::setWarnOnMissing);
-            configVal(config, "fail-on-missing-paths", Config::getBoolean).ifPresent(this::setFailOnMissing);
-            configVal(config, "verbose-paths", Config::getBoolean).ifPresent(this::setVerbosePaths);
-            configVal(config, "paths", Config::getStringList).ifPresent(this::setPaths);
-            return super.withConfig(config);
+        public void withConfig(Config config) {
+            super.withConfig(config);
+
+            cfgBoolean(config, "confd-enabled", this::setConfdEnabled);
+            cfgBoolean(config, "warn-on-missing-paths", this::setWarnOnMissing);
+            cfgBoolean(config, "fail-on-missing-paths", this::setFailOnMissing);
+            cfgBoolean(config, "verbose-paths", this::setVerbosePaths);
+            cfgExtract(config, "paths", Config::getStringList, this::setPaths);
         }
 
         @Override

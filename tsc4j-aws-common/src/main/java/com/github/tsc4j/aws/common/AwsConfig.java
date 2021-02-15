@@ -26,8 +26,6 @@ import lombok.experimental.Accessors;
 
 import java.time.Duration;
 
-import static com.github.tsc4j.core.Tsc4jImplUtils.configVal;
-
 /**
  * Class holding AWS client configuration.
  */
@@ -35,7 +33,7 @@ import static com.github.tsc4j.core.Tsc4jImplUtils.configVal;
 @Accessors(chain = true)
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true, onlyExplicitlyIncluded = true)
-public final class AwsConfig implements WithConfig<AwsConfig> {
+public final class AwsConfig implements WithConfig {
     /**
      * Use AWS anonymous auth? This one takes precedence over {@link #getAccessKeyId()}/{@link #getSecretAccessKey()}.
      */
@@ -94,18 +92,17 @@ public final class AwsConfig implements WithConfig<AwsConfig> {
     private Boolean s3PathStyleAccess = null;
 
     @Override
-    public AwsConfig withConfig(@NonNull Config cfg) {
-        configVal(cfg, "anonymous-auth", Config::getBoolean).ifPresent(this::setAnonymousAuth);
-        configVal(cfg, "access-key-id", Config::getString).ifPresent(this::setAccessKeyId);
-        configVal(cfg, "secret-access-key", Config::getString).ifPresent(this::setSecretAccessKey);
-        configVal(cfg, "region", Config::getString).ifPresent(this::setRegion);
-        configVal(cfg, "endpoint", Config::getString).ifPresent(this::setEndpoint);
-        configVal(cfg, "gzip", Config::getBoolean).ifPresent(this::setGzip);
-        configVal(cfg, "timeout", Config::getDuration).ifPresent(this::setTimeout);
-        configVal(cfg, "max-connections", Config::getInt).ifPresent(this::setMaxConnections);
-        configVal(cfg, "max-error-retry", Config::getInt).ifPresent(this::setMaxErrorRetry);
-        configVal(cfg, "s3-path-style-access", Config::getBoolean).ifPresent(this::setS3PathStyleAccess);
-
-        return this;
+    public void withConfig(@NonNull Config cfg) {
+        cfgBoolean(cfg, "anonymous-auth", this::setAnonymousAuth);
+        cfgBoolean(cfg, "anonymous-auth", this::setAnonymousAuth);
+        cfgString(cfg, "access-key-id", this::setAccessKeyId);
+        cfgString(cfg, "secret-access-key", this::setSecretAccessKey);
+        cfgString(cfg, "region", this::setRegion);
+        cfgString(cfg, "endpoint", this::setEndpoint);
+        cfgBoolean(cfg, "gzip", this::setGzip);
+        cfgDuration(cfg, "timeout", this::setTimeout);
+        cfgInt(cfg, "max-connections", this::setMaxConnections);
+        cfgInt(cfg, "max-error-retry", this::setMaxErrorRetry);
+        cfgBoolean(cfg, "s3-path-style-access", this::setS3PathStyleAccess);
     }
 }

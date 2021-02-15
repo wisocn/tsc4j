@@ -66,7 +66,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -622,31 +621,6 @@ public class Tsc4jImplUtils {
     }
 
     /**
-     * Runs given {@code consumer} if given config {@path} exists.
-     * <p>
-     * Example usage:<br/>
-     * {@code
-     * configVal(config, "some.path", Config::getString, this::setSomePath);
-     * }
-     *
-     * @param config    config instance to fetch value from
-     * @param path      config path from which fetch value from
-     * @param converter {@link Config} converter bi-function
-     * @param consumer  consumer to run if value is present
-     * @param <E>       type
-     * @return optional of fetched value from config
-     * @see #configVal(Config, String, BiFunction)
-     */
-    public static <E> Optional<E> configVal(@NonNull Config config,
-                                            @NonNull String path,
-                                            @NonNull BiFunction<Config, String, E> converter,
-                                            @NonNull Consumer<E> consumer) {
-        val opt = configVal(config, path, converter);
-        opt.ifPresent(consumer::accept);
-        return opt;
-    }
-
-    /**
      * Performs configuration scan invoking visitor on all found configuration paths.
      *
      * @param config  config to scan
@@ -1146,12 +1120,10 @@ public class Tsc4jImplUtils {
             val instance = instanceOpt.get();
             log.debug("loader {} returned concrete instance: {}", loader, instance);
             if (instance instanceof WithConfig) {
-                val configuredInstance = ((WithConfig) instance).withConfig(config);
-                log.debug("configured instance {} to {}", instance, configuredInstance);
-                return (T) configuredInstance;
-            } else {
-                return instance;
+                ((WithConfig) instance).withConfig(config);
+                log.debug("configured instance: {}", instance);
             }
+            return instance;
         }
 
         // looks like the only option we have is to get a builder from loader

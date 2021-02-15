@@ -170,7 +170,7 @@ class AwsSdk1UtilsSpec extends Specification {
         expect:
         !AwsSdk1Utils.getEndpointConfiguration(emptyConfig).isPresent()
         !AwsSdk1Utils.getEndpointConfiguration(emptyConfig.setEndpoint(endpoint)).isPresent()
-        !AwsSdk1Utils.getEndpointConfiguration(emptyConfig.withConfig(mapConfig)).isPresent()
+        !AwsSdk1Utils.getEndpointConfiguration({ emptyConfig.withConfig(mapConfig); emptyConfig }.call()).isPresent()
 
         where:
         endpoint << [null, "", "    "]
@@ -196,7 +196,9 @@ class AwsSdk1UtilsSpec extends Specification {
         config.getSigningRegion() == "us-west-3"
 
         when: "also check that the same is true if object is configured with configuration"
-        config = AwsSdk1Utils.getEndpointConfiguration(new AwsConfig().withConfig(cfg)).get()
+        awsConfig = new AwsConfig()
+        awsConfig.withConfig(cfg)
+        config = AwsSdk1Utils.getEndpointConfiguration(awsConfig).get()
 
         then:
         config.getServiceEndpoint() == endpoint.trim()
@@ -247,7 +249,8 @@ class AwsSdk1UtilsSpec extends Specification {
         endpointConfig.getSigningRegion() == region
 
         when: "check whether config is the same if instance is configured with config"
-        awsConfig = new AwsConfig().withConfig(cfg)
+        awsConfig = new AwsConfig()
+        awsConfig.withConfig(cfg)
 
         then:
         with(awsConfig) {

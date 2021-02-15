@@ -59,10 +59,9 @@ abstract class FilesystemLikeConfigSourceSpec extends AbstractConfigSourceSpec {
         def cfg = ConfigFactory.empty().withFallback(cfgObj)
 
         when:
-        def res = builder.withConfig(cfg)
+        builder.withConfig(cfg)
 
         then:
-        res.is(builder)
 
         builder.isConfdEnabled() == true
         builder.isWarnOnMissing() == true

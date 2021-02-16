@@ -303,9 +303,10 @@ public final class S3ConfigSource
         }
 
         @Override
-        public Builder withConfig(@NonNull Config cfg) {
+        public void withConfig(@NonNull Config cfg) {
+            super.withConfig(cfg);
+
             getAwsConfig().withConfig(cfg);
-            return super.withConfig(cfg);
         }
 
         @Override

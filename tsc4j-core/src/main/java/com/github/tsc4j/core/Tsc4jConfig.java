@@ -29,8 +29,6 @@ import lombok.Value;
 import java.time.Duration;
 import java.util.List;
 
-import static com.github.tsc4j.core.Tsc4jImplUtils.configVal;
-
 /**
  * Tsc4j bootstrap configuration. Contains all required settings for initializing configuration sources,
  * transformers, etc.
@@ -103,17 +101,16 @@ public class Tsc4jConfig {
     /**
      * Builder for {@link Tsc4jConfig}.
      */
-    public static final class Tsc4jConfigBuilder implements WithConfig<Tsc4jConfigBuilder> {
+    public static final class Tsc4jConfigBuilder implements WithConfig {
         @Override
-        public Tsc4jConfigBuilder withConfig(@NonNull Config config) {
-            configVal(config, "refresh-interval", Config::getDuration, this::refreshInterval);
-            configVal(config, "refresh-interval-jitter-pct", Config::getInt, this::refreshIntervalJitterPct);
-            configVal(config, "reverse-update-order", Config::getBoolean, this::reverseUpdateOrder);
-            configVal(config, "cli-enabled", Config::getBoolean, this::cliEnabled);
-            configVal(config, "sources", Config::getConfigList, this::sources);
-            configVal(config, "transformers", Config::getConfigList, this::transformers);
-            configVal(config, "value-providers", Config::getConfigList, this::valueProviders);
-            return this;
+        public void withConfig(@NonNull Config config) {
+            cfgDuration(config, "refresh-interval", this::refreshInterval);
+            cfgInt(config, "refresh-interval-jitter-pct", this::refreshIntervalJitterPct);
+            cfgBoolean(config, "reverse-update-order", this::reverseUpdateOrder);
+            cfgBoolean(config, "cli-enabled", this::cliEnabled);
+            cfgExtract(config, "sources", Config::getConfigList, this::sources);
+            cfgExtract(config, "transformers", Config::getConfigList, this::transformers);
+            cfgExtract(config, "value-providers", Config::getConfigList, this::valueProviders);
         }
     }
 }

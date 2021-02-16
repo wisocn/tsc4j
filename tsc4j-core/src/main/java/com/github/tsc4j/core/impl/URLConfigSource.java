@@ -294,15 +294,16 @@ public final class URLConfigSource extends AbstractConfigSource {
         }
 
         @Override
-        public Builder withConfig(Config config) {
-            configVal(config, "method", Config::getString).ifPresent(this::setMethod);
-            configVal(config, "urls", Config::getStringList).ifPresent(this::setUrls);
-            configVal(config, "username", Config::getString).ifPresent(this::setUsername);
-            configVal(config, "password", Config::getString).ifPresent(this::setPassword);
-            configVal(config, "headers", Config::getObject)
+        public void withConfig(Config config) {
+            super.withConfig(config);
+
+            cfgString(config, "method", this::setMethod);
+            cfgExtract(config, "urls", Config::getStringList, this::setUrls);
+            cfgString(config, "username", this::setUsername);
+            cfgString(config, "password", this::setPassword);
+            cfgConfigObject(config, "headers")
                 .ifPresent(e -> e.unwrapped().forEach((key, val) -> header(key, val.toString())));
-            configVal(config, "verify-tls", Config::getBoolean).ifPresent(this::setVerifyTLS);
-            return super.withConfig(config);
+            cfgBoolean(config, "verify-tls", this::setVerifyTLS);
         }
 
         @Override

@@ -22,5 +22,24 @@ package com.github.tsc4j.core;
  * @deprecated use {@link com.github.tsc4j.test.TestReloadable}.
  */
 @Deprecated
-public final class TestReloadable extends com.github.tsc4j.test.TestReloadable {
+public final class TestReloadable<T> extends com.github.tsc4j.test.TestReloadable {
+    /**
+     * Creates new reloadable without initial value
+     *
+     * @deprecated use com.github.tsc4j.test.{@link com.github.tsc4j.test.TestReloadable#TestReloadable()}
+     */
+    public TestReloadable() {
+        super();
+    }
+
+    /**
+     * Creates new reloadable with initial value
+     *
+     * @param initialValue
+     * @deprecated use com.github.tsc4j.test.{@link com.github.tsc4j.test.TestReloadable#TestReloadable(Object)}
+     */
+    @SuppressWarnings("unchecked")
+    public TestReloadable(T initialValue) {
+        super(initialValue);
+    }
 }

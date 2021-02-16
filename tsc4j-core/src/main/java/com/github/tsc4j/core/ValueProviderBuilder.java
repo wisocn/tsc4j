@@ -43,9 +43,10 @@ public abstract class ValueProviderBuilder<T extends ValueProviderBuilder<T>> ex
     }
 
     @Override
-    public T withConfig(@NonNull Config config) {
-        configVal(config, "allow-missing", Config::getBoolean).ifPresent(this::setAllowMissing);
-        return super.withConfig(config);
+    public void withConfig(@NonNull Config config) {
+        super.withConfig(config);
+
+        cfgBoolean(config, "allow-missing", this::setAllowMissing);
     }
 
     /**

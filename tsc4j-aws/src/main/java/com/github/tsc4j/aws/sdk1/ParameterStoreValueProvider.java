@@ -106,9 +106,10 @@ public final class ParameterStoreValueProvider extends AbstractConfigValueProvid
         boolean decrypt = true;
 
         @Override
-        public Builder withConfig(@NonNull Config config) {
-            configVal(config, "decrypt", Config::getBoolean).ifPresent(this::setDecrypt);
-            return super.withConfig(config);
+        public void withConfig(@NonNull Config config) {
+            super.withConfig(config);
+            
+            cfgBoolean(config, "decrypt", this::setDecrypt);
         }
 
         @Override

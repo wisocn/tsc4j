@@ -639,43 +639,6 @@ class Tsc4jImplUtilsSpec extends Specification {
         'someGreatThing'            | 'someGreatThing'
     }
 
-    def "configVal(#key) should return expected result"() {
-        given:
-        def value = "bang"
-        def cfgMap = [
-            'foo-bar'  : value,
-            'fooBar'   : value,
-            'barBaz'   : value,
-            'foo_bar'  : value,
-            'fooBarBaz': value
-        ]
-        def config = ConfigFactory.parseMap(cfgMap)
-
-        when:
-        def opt = Tsc4jImplUtils.configVal(config, key, { cfg, key -> cfg.getString(key) })
-
-        then:
-        opt.isPresent() == expected
-        if (!expected) {
-            return
-        }
-
-        when:
-        def received = opt.get()
-
-        then:
-        received == value
-
-        where:
-        key            | expected
-        "foo-bar"      | true
-        "fooBar"       | true
-        'bar-baz'      | true
-        'barBaz'       | true
-        'foo-bar-baz'  | true
-        "non-existent" | false
-    }
-
     def "createTransformer() should throw in case of non-existing implementation"() {
         given:
         def config = mapConfig(cfgMap)

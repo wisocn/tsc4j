@@ -68,11 +68,9 @@ class AwsConfigSpec extends Specification {
         def awsConfig = new AwsConfig()
 
         when:
-        def res = awsConfig.withConfig(cfg)
+        awsConfig.withConfig(cfg)
 
         then:
-        res.is(awsConfig)
-
         with(awsConfig) {
             isAnonymousAuth() == true
             getAccessKeyId() == accessKeyId

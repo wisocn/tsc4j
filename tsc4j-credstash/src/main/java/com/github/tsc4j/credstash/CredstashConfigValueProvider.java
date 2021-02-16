@@ -304,13 +304,13 @@ public final class CredstashConfigValueProvider extends AbstractConfigValueProvi
         }
 
         @Override
-        public Builder withConfig(@NonNull Config cfg) {
+        public void withConfig(@NonNull Config cfg) {
+            super.withConfig(cfg);
+
             getAwsConfig().withConfig(cfg);
 
-            configVal(cfg, "table-name", Config::getString).ifPresent(this::setTableName);
-            configVal(cfg, "encryption-context", Config::getConfig).ifPresent(this::withEncryptionContext);
-
-            return super.withConfig(cfg);
+            cfgString(cfg, "table-name", this::setTableName);
+            cfgConfig(cfg, "encryption-context", this::withEncryptionContext);
         }
 
         @Override

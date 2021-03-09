@@ -65,10 +65,12 @@ public final class ConfigValueProviderConfigTransformer
         Pattern.compile("^([^\\|]+)(?:\\|([^\\|]+))?\\|(.+)"),
         Pattern.compile("^([\\w\\.\\-]+)(?::([\\w\\-\\.]+))?:(?://)?(.+)")
         // credstash://foo.bar, awsssm://foo/bar, consul://foo/bar
-        //Pattern.compile()
     ));
 
     private final List<ConfigValueProvider> providers;
+
+    private final OnlyOnce<String> onlyOnce = new OnlyOnce<>(
+        it -> log.warn("{} can't find registered config value provider: {}", this, it), 1000);
 
     /**
      * Creates new instance from builder
@@ -168,9 +170,25 @@ public final class ConfigValueProviderConfigTransformer
     private void registerValueProviderFetchTask(@NonNull UpdatableConfigValue uv, @NonNull UpdateContext ctx) {
         val valueSpec = getValueSpec(uv.variable);
         log.trace("{} found value spec for '{}': {}", this, uv.variable, valueSpec);
-        val valueProvider = getValueProvider(valueSpec.valueProviderType, valueSpec.valueProviderName);
-        log.debug("{} will ask for '{}' (provider: {}, uv: {})", this, valueSpec.configValueName, valueProvider, uv);
-        ctx.registerTask(valueProvider, valueSpec.configValueName, uv);
+
+        // get value provider and register fetch task
+        getValueProvider(valueSpec.valueProviderType, valueSpec.valueProviderName)
+            .map(it -> {
+                log.debug("{} will ask for '{}' (provider: {}, uv: {})", this, valueSpec.configValueName, it, uv);
+                ctx.registerTask(it, valueSpec.configValueName, uv);
+                return it;
+            })
+            .orElseGet(() -> {
+                val desc = "'" + valueSpec.valueProviderType + ":" + valueSpec.valueProviderName + "'";
+                if (allowErrors()) {
+                    onlyOnce.add(desc);
+                } else {
+                    throw new IllegalStateException("Cannot find config value provider: " + desc);
+                }
+
+                // no other way to better handle absent cases.
+                return null;
+            });
     }
 
     /**
@@ -181,14 +199,12 @@ public final class ConfigValueProviderConfigTransformer
      * @return value provider
      * @throws com.github.tsc4j.core.Tsc4jException if provider cannot be found
      */
-    private ConfigValueProvider getValueProvider(@NonNull String type, @NonNull String name) {
+    private Optional<ConfigValueProvider> getValueProvider(@NonNull String type, @NonNull String name) {
         val anyNameIsOkay = name.isEmpty();
         return providers.stream()
             .filter(e -> e.getType().equals(type))
             .filter(e -> anyNameIsOkay || e.getName().equals(name))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("cannot find value provider type '" +
-                type + "' with name '" + name + "'"));
+            .findFirst();
     }
 
     private ValueSpec getValueSpec(@NonNull String str) {

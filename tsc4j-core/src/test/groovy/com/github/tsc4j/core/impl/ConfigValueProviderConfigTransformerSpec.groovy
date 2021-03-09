@@ -135,6 +135,85 @@ class ConfigValueProviderConfigTransformerSpec extends Specification {
         noExceptionThrown()
     }
 
+    def "should throw if there is config value transformer missing in a magic value"() {
+        given:
+        def providerA = Mock(ConfigValueProvider)
+        def providerB = Mock(ConfigValueProvider)
+        def providerC = Mock(ConfigValueProvider)
+
+        and:
+        def transformer = ConfigValueProviderConfigTransformer.builder()
+                                                              .withProviders([providerA, providerB, providerC])
+                                                              .build()
+
+        and:
+        def config = ConfigFactory.parseString("""
+           foo: bar
+           a: \"%{typeA://x/y}\"
+           b: \"%{typeB://z/w}\"
+           c: \"$varSpec\"
+        """)
+
+        when:
+        def result = transformer.transform(config)
+
+        then:
+        providerA.getType() >> 'typeA'
+        providerB.getType() >> 'typeB'
+
+        providerC.getType() >> providerType
+        providerC.getName() >> providerName
+
+        def ex = thrown(IllegalStateException)
+        ex.getMessage().contains('typeC')
+        result == null
+
+        where:
+        providerType | providerName | varSpec
+        'foo'        | ''           | '%{typeC://a/b}'
+        'typeC'      | 'some-name'  | '%{typeC:my-cool-name://a/b}'
+    }
+
+    def "should NOT throw if there is config value transformer missing in a magic value and configured this way"() {
+        given:
+        def providerA = Mock(ConfigValueProvider)
+        def providerB = Mock(ConfigValueProvider)
+        def providerC = Mock(ConfigValueProvider)
+
+        and:
+        def transformer = ConfigValueProviderConfigTransformer.builder()
+                                                              .withProviders([providerA, providerB, providerC])
+                                                              .setAllowErrors(true)
+                                                              .build()
+
+        and:
+        def config = ConfigFactory.parseString("""
+           foo: bar
+           a: \"%{typeA://x/y}\"
+           b: \"%{typeB://z/w}\"
+           c: \"$varSpec\"
+        """)
+
+        when:
+        def result = transformer.transform(config)
+
+        then:
+        providerA.getType() >> 'typeA'
+        providerA.get(_) >> [:]
+        providerB.getType() >> 'typeB'
+        providerB.get(_) >> [:]
+
+        providerC.getType() >> providerType
+        providerC.getName() >> providerName
+
+        noExceptionThrown()
+
+        where:
+        providerType | providerName | varSpec
+        'foo'        | ''           | '%{typeC://a/b}'
+        'typeC'      | 'some-name'  | '%{typeC:my-cool-name://a/b}'
+    }
+
     def "should correctly replace simple string with a boolean value: =>#newRawValue<="() {
         given:
         def cfgPath = "some.cfg.path"

@@ -103,6 +103,21 @@ public final class FilesConfigSource extends FilesystemLikeConfigSource<String> 
      */
     public static class Builder extends FilesystemLikeConfigSource.Builder<Builder> {
         @Override
+        public String type() {
+            return "files";
+        }
+
+        @Override
+        public String description() {
+            return "Loads HOCON files from filesystem.";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return FilesConfigSource.class;
+        }
+
+        @Override
         public ConfigSource build() {
             return new FilesConfigSource(this);
         }

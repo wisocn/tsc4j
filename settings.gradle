@@ -7,20 +7,21 @@ rootProject.name = "tsc4j"
 include "${rootProject.name}-api"
 include "${rootProject.name}-bom"
 include "${rootProject.name}-core"
-include "${rootProject.name}-aws-common"
-include "${rootProject.name}-aws"
-include "${rootProject.name}-gcp"
-include "${rootProject.name}-spring"
-include "spring-boot-starter-${rootProject.name}"
-include "${rootProject.name}-guice"
-include "${rootProject.name}-credstash"
-include "${rootProject.name}-micronaut"
-include "${rootProject.name}-micronaut2"
-include "${rootProject.name}-cli"
-include "${rootProject.name}-uberjar"
-include "${rootProject.name}-jackson"
+//include "${rootProject.name}-aws-common"
+//include "${rootProject.name}-aws"
+//include "${rootProject.name}-gcp"
+//include "${rootProject.name}-spring"
+//include "spring-boot-starter-${rootProject.name}"
+//include "${rootProject.name}-guice"
+//include "${rootProject.name}-credstash"
+//include "${rootProject.name}-micronaut"
+//include "${rootProject.name}-micronaut2"
+//include "${rootProject.name}-cli"
+//include "${rootProject.name}-uberjar"
+//include "${rootProject.name}-jackson"
 
 // include all examples/ subdirectories as examples
+/*
 def examples = new File("examples")
 examples.eachDir { dir ->
   // include directory only if it contains build.gradle file
@@ -28,5 +29,6 @@ examples.eachDir { dir ->
   if (buildFile.exists())
     include "${examples.name}:${dir.name}"
 }
+ */
 
 // EOF

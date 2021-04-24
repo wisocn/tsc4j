@@ -303,7 +303,7 @@ public abstract class FilesystemLikeConfigSource<T> extends AbstractConfigSource
     }
 
     /**
-     * Builder for {@link FilesystemLikeConfigSource}.
+     * Base implementation for {@link FilesystemLikeConfigSource} implementation builders.
      */
     public static abstract class Builder<T extends Builder<T>> extends ConfigSourceBuilder<T> {
         /**
@@ -395,7 +395,7 @@ public abstract class FilesystemLikeConfigSource<T> extends AbstractConfigSource
         }
 
         @Override
-        protected T checkState() {
+        public T checkState() {
             val paths = Tsc4jImplUtils.toUniqueList(getPaths());
             if (paths.isEmpty()) {
                 throw new IllegalStateException("At least one config loading path needs to be defined.");

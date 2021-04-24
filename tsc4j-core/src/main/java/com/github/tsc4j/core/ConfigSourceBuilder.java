@@ -16,13 +16,16 @@
 
 package com.github.tsc4j.core;
 
+import com.github.tsc4j.core.creation.AbstractInstanceCreator;
 import com.typesafe.config.Config;
 import lombok.Getter;
 
 /**
  * Base class for writing {@link AbstractConfigSource} builder aliases.
  */
-public abstract class ConfigSourceBuilder<T extends ConfigSourceBuilder<T>> extends AbstractBuilder<ConfigSource, T> {
+public abstract class ConfigSourceBuilder<T extends ConfigSourceBuilder<T>>
+    extends AbstractInstanceCreator<ConfigSource, T> {
+
     /**
      * Tells whether warning should be logged when config source will try to read non-existing config location.
      */

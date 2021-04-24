@@ -34,6 +34,7 @@ import lombok.val;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html">AWS SSM
@@ -138,7 +139,7 @@ public final class ParameterStoreConfigSource extends AbstractConfigSource {
         }
 
         @Override
-        protected Builder checkState() {
+        public Builder checkState() {
             if (getPaths() == null || getPaths().isEmpty()) {
                 throw new IllegalStateException("At least one SSM parameter store path should be defined.");
             }
@@ -146,6 +147,26 @@ public final class ParameterStoreConfigSource extends AbstractConfigSource {
                 throw new IllegalStateException("Parameter at-path cannot be null.");
             }
             return super.checkState();
+        }
+
+        @Override
+        public String type() {
+            return "aws.ssm";
+        }
+
+        @Override
+        public Set<String> typeAliases() {
+            return Tsc4jImplUtils.unmodifiableSet("aws.param.store", "ssm");
+        }
+
+        @Override
+        public String description() {
+            return "AWS SDK 1.x SSM Parameter Store config source.";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return ParameterStoreConfigSource.class;
         }
 
         @Override

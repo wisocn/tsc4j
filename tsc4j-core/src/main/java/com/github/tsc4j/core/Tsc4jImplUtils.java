@@ -18,12 +18,14 @@ package com.github.tsc4j.core;
 
 
 import com.github.tsc4j.api.WithConfig;
+import com.github.tsc4j.core.creation.InstanceCreator;
 import com.github.tsc4j.core.impl.ClasspathConfigSource;
 import com.github.tsc4j.core.impl.CliConfigSource;
 import com.github.tsc4j.core.impl.ConfigValueProviderConfigTransformer;
 import com.github.tsc4j.core.impl.NoopConfigTransformer;
 import com.github.tsc4j.core.impl.SimpleTsc4jCache;
 import com.github.tsc4j.core.impl.Stopwatch;
+import com.github.tsc4j.core.impl.SvcLoader;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigList;
@@ -331,6 +333,10 @@ public class Tsc4jImplUtils {
      */
     public static boolean close(AutoCloseable closeable) {
         return close(closeable, log);
+    }
+
+    public boolean close(Collection<AutoCloseable> closeables, @NonNull Logger log) {
+        closeables.forEach(it -> close(it, log));
     }
 
     /**
@@ -1111,7 +1117,6 @@ public class Tsc4jImplUtils {
         }
     }
 
-
     @SuppressWarnings("unchecked")
     private static <T> T createConfiguredInstanceFromLoader(Tsc4jLoader<T> loader, Config config, int cfgNum) {
         // can this loader create final instance?
@@ -1461,6 +1466,23 @@ public class Tsc4jImplUtils {
             .map(loader -> (Tsc4jLoader<T>) loader)
             .sorted()
             .collect(Collectors.toList());
+    }
+
+    public <T extends InstanceCreator<?>> List<T> availableImplementations(@NonNull Class<T> clazz) {
+        return SvcLoader.load(clazz);
+    }
+
+    public <B, T extends InstanceCreator<B>> Optional<T> tryLoadCreator(@NonNull String implType,
+                                                                        @NonNull Class<T> clazz) {
+        return SvcLoader.unorderedStream(clazz)
+            .filter(it -> it.supports(implType))
+            .findFirst();
+    }
+
+    public <B, T extends InstanceCreator<B>> T loadCreator(@NonNull String implType,
+                                                           @NonNull Class<T> clazz) {
+        return tryLoadCreator(implType, clazz)
+            .orElseThrow(() -> new IllegalArgumentException(""));
     }
 
     /**
@@ -1817,5 +1839,28 @@ public class Tsc4jImplUtils {
                                                    @NonNull Duration cacheTtl,
                                                    @NonNull Clock clock) {
         return new SimpleTsc4jCache<>(name, cacheTtl, clock);
+    }
+
+    /**
+     * Creates unmodifiable set from given elements.
+     *
+     * @param elements set elements
+     * @param <T>      element type
+     * @return unmodifiable set.
+     */
+    public static <T> Set<T> unmodifiableSet(@NonNull T... elements) {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(unmodifiableList(elements)));
+    }
+
+
+    /**
+     * Creates unmodifiable list from given elements.
+     *
+     * @param elements elements
+     * @param <T>      element type
+     * @return unmodifiable set.
+     */
+    public static <T> List<T> unmodifiableList(@NonNull T... elements) {
+        return Collections.unmodifiableList(Arrays.asList(elements));
     }
 }

@@ -307,7 +307,7 @@ public final class URLConfigSource extends AbstractConfigSource {
         }
 
         @Override
-        protected Builder checkState() {
+        public Builder checkState() {
             // check urls
             if (urls.isEmpty()) {
                 throw new IllegalArgumentException("No urls to fetch configuration from were set");
@@ -325,6 +325,21 @@ public final class URLConfigSource extends AbstractConfigSource {
             Tsc4jImplUtils.optString(getMethod()).orElseThrow(() -> new IllegalArgumentException("HTTP request method must be set."));
 
             return super.checkState();
+        }
+
+        @Override
+        public String type() {
+            return "url";
+        }
+
+        @Override
+        public String description() {
+            return "Loads HOCON files from HTTP URLs.";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return URLConfigSource.class;
         }
 
         @Override

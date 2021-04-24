@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.core.impl;
+package com.github.tsc4j.core;
 
-import com.github.tsc4j.core.AbstractTsc4jLoader;
-import com.github.tsc4j.core.Tsc4jLoader;
+import com.github.tsc4j.core.creation.InstanceCreator;
 
 /**
- * {@link Tsc4jLoader} implementation that is able to bootstrap {@link FilesConfigSource}
+ * Interface that is able to create {@link ConfigSource} implementation and which implementations should be discoverable
+ * via {@link java.util.ServiceLoader}.
  */
-public final class FilesConfigSourceLoader extends AbstractTsc4jLoader<FilesConfigSource> {
-    public FilesConfigSourceLoader() {
-        super(FilesConfigSource.class, FilesConfigSource::builder,
-            FilesConfigSource.TYPE,
-            "Loads HOCON files from filesystem folders.",
-            "file");
-    }
+public interface ConfigSourceCreator extends InstanceCreator<ConfigSource> {
 }

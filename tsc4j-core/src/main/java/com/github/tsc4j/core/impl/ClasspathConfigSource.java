@@ -180,10 +180,25 @@ public final class ClasspathConfigSource extends FilesystemLikeConfigSource<Stri
     /**
      * Builder for {@link ClasspathConfigSource}.
      */
-    public static class Builder extends FilesystemLikeConfigSource.Builder<Builder> {
+    public static final class Builder extends FilesystemLikeConfigSource.Builder<Builder> {
         public Builder() {
             setWarnOnMissing(false);
             setPaths(DEFAULT_CLASSPATH_PATHS);
+        }
+
+        @Override
+        public String type() {
+            return "classpath";
+        }
+
+        @Override
+        public String description() {
+            return "Loads HOCON files from classpath.";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return ClasspathConfigSource.class;
         }
 
         @Override

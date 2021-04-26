@@ -42,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -307,6 +308,26 @@ public final class S3ConfigSource
             super.withConfig(cfg);
 
             getAwsConfig().withConfig(cfg);
+        }
+
+        @Override
+        public String type() {
+            return "aws.s3";
+        }
+
+        @Override
+        public Set<String> typeAliases() {
+            return Tsc4jImplUtils.unmodifiableSet("s3");
+        }
+
+        @Override
+        public String description() {
+            return "Loads HOCON files from AWS S3 buckets.";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return S3ConfigSource.class;
         }
 
         @Override

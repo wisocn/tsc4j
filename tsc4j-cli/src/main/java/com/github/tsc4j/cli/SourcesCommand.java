@@ -16,8 +16,8 @@
 
 package com.github.tsc4j.cli;
 
+import com.github.tsc4j.core.ConfigSourceCreator;
 import com.github.tsc4j.core.Tsc4jImplUtils;
-import com.github.tsc4j.core.Tsc4jLoader;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -41,18 +41,18 @@ public class SourcesCommand extends AbstractCommand {
 
     @Override
     protected int doCall() {
-        return doCall(Tsc4jImplUtils.availableSources());
+        return doCall(Tsc4jImplUtils.instanceCreators(ConfigSourceCreator.class));
     }
 
-    protected <T> Integer doCall(@NonNull Collection<Tsc4jLoader<T>> loaders) {
+    protected Integer doCall(@NonNull Collection<ConfigSourceCreator> creators) {
         getStderr().printf(FMT, "name", "aliases", "description");
-        loaders.forEach(this::printLoader);
+        creators.forEach(this::printLoader);
         return 0;
     }
 
-    private void printLoader(Tsc4jLoader<?> e) {
-        val aliasStr = e.aliases().stream().collect(Collectors.joining(", "));
-        getStdout().printf(FMT, e.name(), aliasStr, e.description());
+    private void printLoader(ConfigSourceCreator e) {
+        val aliasStr = e.typeAliases().stream().collect(Collectors.joining(", "));
+        getStdout().printf(FMT, e.type(), aliasStr, e.description());
     }
 
     @Override

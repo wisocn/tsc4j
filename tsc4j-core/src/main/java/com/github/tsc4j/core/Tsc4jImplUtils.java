@@ -1422,6 +1422,17 @@ public class Tsc4jImplUtils {
         return sanitizeEnvs(x);
     }
 
+    /**
+     * Returns available instance creators for a given {@link InstanceCreator} sub-type.
+     *
+     * @param clazz instance creator subtype class
+     * @param <B>   instance creator type
+     * @return list of available creator implementations
+     */
+    public <B extends InstanceCreator<?>> List<B> instanceCreators(Class<B> clazz) {
+        return SvcLoader.load(clazz);
+    }
+
 //    /**
 //     * Returns list of available config source loaders.
 //     *

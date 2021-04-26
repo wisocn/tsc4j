@@ -1,10 +1,10 @@
 import com.github.tsc4j.api.ConfigValueDecoder;
 import com.github.tsc4j.core.BeanMapper;
 import com.github.tsc4j.core.ReflectiveBeanMapper;
-import com.github.tsc4j.core.Tsc4jLoader;
-import com.github.tsc4j.core.impl.ClasspathConfigSourceLoader;
-import com.github.tsc4j.core.impl.FilesConfigSourceLoader;
-import com.github.tsc4j.core.impl.UrlConfigSourceLoader;
+import com.github.tsc4j.core.ConfigSourceCreator
+import com.github.tsc4j.core.impl.ClasspathConfigSource;
+import com.github.tsc4j.core.impl.FilesConfigSource;
+import com.github.tsc4j.core.impl.UrlConfigSource;
 
 module com.github.tsc4j.core {
     requires static lombok;
@@ -26,11 +26,12 @@ module com.github.tsc4j.core {
     exports com.github.tsc4j.core;
 
     uses ConfigValueDecoder;
-    uses Tsc4jLoader;
-    provides Tsc4jLoader with
-        ClasspathConfigSourceLoader,
-        FilesConfigSourceLoader,
-        UrlConfigSourceLoader;
+
+    uses ConfigSourceCreator;
+    provides ConfigSourceCreator with
+        ClasspathConfigSource$Builder,
+        FilesConfigSource$Builder,
+        UrlConfigSource$Builder;
 
     uses BeanMapper;
     provides BeanMapper with ReflectiveBeanMapper;

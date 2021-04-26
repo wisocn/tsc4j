@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.aws.sdk1;
+package com.github.tsc4j.cli
 
-import com.github.tsc4j.core.AbstractTsc4jLoader;
+import groovy.util.logging.Slf4j
+import spock.lang.Specification
+import spock.lang.Unroll
 
-/**
- * {@link com.github.tsc4j.core.Tsc4jLoader} implementation that is able to bootstrap {@link S3ConfigSource}
- */
-public final class S3ConfigSourceLoader extends AbstractTsc4jLoader<S3ConfigSource> {
-    public S3ConfigSourceLoader() {
-        super(S3ConfigSource.class, S3ConfigSource::builder,
-            S3ConfigSource.TYPE,
-            "Loads HOCON files from AWS S3 buckets.", "s3");
-    }
+@Slf4j
+@Unroll
+class SourcesCommandSpec extends Specification {
 }

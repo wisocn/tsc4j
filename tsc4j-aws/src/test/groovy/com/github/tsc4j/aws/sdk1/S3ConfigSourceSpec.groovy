@@ -25,8 +25,10 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.github.tsc4j.core.AbstractConfigSource
 import com.github.tsc4j.core.ConfigQuery
 import com.github.tsc4j.core.ConfigSourceBuilder
+import com.github.tsc4j.core.ConfigSourceCreator
 import com.github.tsc4j.core.FilesystemLikeConfigSourceSpec
 import com.github.tsc4j.core.Tsc4jImplUtils
+import com.github.tsc4j.core.creation.InstanceCreators
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import groovy.util.logging.Slf4j
@@ -67,6 +69,16 @@ class S3ConfigSourceSpec extends FilesystemLikeConfigSourceSpec {
     def cleanupSpec() {
         log.info("stopping s3 mock")
         s3Mock?.shutdown()
+    }
+
+    def "creator should be discoverable for implementation type: #impl"() {
+        expect:
+        InstanceCreators.loadInstanceCreator(ConfigSourceCreator, impl) instanceof S3ConfigSource.Builder
+
+        where:
+        impl << [
+            'aws.s3', 's3', 'S3', 'S3ConfigSource', 'com.github.tsc4j.aws.sdk1.FilesConfigSource'
+        ]
     }
 
     def "new builder should contain correct default values"() {

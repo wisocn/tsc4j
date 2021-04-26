@@ -50,6 +50,21 @@ public class BadConfigSource4 implements ConfigSource {
             throw new IllegalAccessException("Hi!");
         }
 
+        @Override
+        public String type() {
+            return "bad4";
+        }
+
+        @Override
+        public String description() {
+            return null;
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return BadConfigSource4.class;
+        }
+
         @SneakyThrows
         @Override
         public ConfigSource build() {

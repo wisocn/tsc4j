@@ -1,0 +1,3 @@
+com.github.tsc4j.core.impl.BarImpl
+com.github.tsc4j.core.impl.BadImpl
+com.github.tsc4j.core.impl.FooImpl

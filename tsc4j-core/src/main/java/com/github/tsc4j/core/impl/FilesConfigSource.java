@@ -20,6 +20,7 @@ package com.github.tsc4j.core.impl;
 import com.github.tsc4j.core.ConfigQuery;
 import com.github.tsc4j.core.ConfigSource;
 import com.github.tsc4j.core.FilesystemLikeConfigSource;
+import com.github.tsc4j.core.Tsc4jImplUtils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.NonNull;
@@ -27,6 +28,7 @@ import lombok.val;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -105,6 +107,11 @@ public final class FilesConfigSource extends FilesystemLikeConfigSource<String> 
         @Override
         public String type() {
             return "files";
+        }
+
+        @Override
+        public Set<String> typeAliases() {
+            return Tsc4jImplUtils.unmodifiableSet("file");
         }
 
         @Override

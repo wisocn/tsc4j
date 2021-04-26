@@ -19,12 +19,24 @@ package com.github.tsc4j.core.impl
 
 import com.github.tsc4j.core.AbstractConfigSource
 import com.github.tsc4j.core.ConfigSourceBuilder
+import com.github.tsc4j.core.ConfigSourceCreator
 import com.github.tsc4j.core.FilesystemLikeConfigSourceSpec
+import com.github.tsc4j.core.creation.InstanceCreators
 import groovy.util.logging.Slf4j
 import spock.lang.Unroll
 
 @Slf4j
+@Unroll
 class ClasspathConfigSourceSpec extends FilesystemLikeConfigSourceSpec {
+    def "creator should be discoverable for implementation type: #impl"() {
+        expect:
+        InstanceCreators.loadInstanceCreator(ConfigSourceCreator, impl) instanceof ClasspathConfigSource.Builder
+
+        where:
+        impl << [
+            'classpath', 'cp', 'ClasspathConfigSource', 'com.github.tsc4j.core.impl.ClasspathConfigSource'
+        ]
+    }
 
     def "should not warn on non-existing by default"() {
         expect:

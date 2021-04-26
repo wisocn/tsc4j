@@ -1,0 +1,3 @@
+com.github.tsc4j.core.impl.ClasspathConfigSource$Builder
+com.github.tsc4j.core.impl.FilesConfigSource$Builder
+com.github.tsc4j.core.impl.URLConfigSource$Builder

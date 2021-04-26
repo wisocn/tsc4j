@@ -1,0 +1,6 @@
+com.github.tsc4j.core.creation.CoolServiceA$Builder
+com.github.tsc4j.core.creation.CoolServiceB$Builder
+com.github.tsc4j.core.creation.CoolServiceC$Builder
+com.github.tsc4j.core.creation.FaultyServiceA$Builder
+com.github.tsc4j.core.creation.FaultyServiceB$Builder
+com.github.tsc4j.core.creation.FaultyServiceC$Builder

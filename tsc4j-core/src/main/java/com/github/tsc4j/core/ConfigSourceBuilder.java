@@ -24,7 +24,8 @@ import lombok.Getter;
  * Base class for writing {@link AbstractConfigSource} builder aliases.
  */
 public abstract class ConfigSourceBuilder<T extends ConfigSourceBuilder<T>>
-    extends AbstractInstanceCreator<ConfigSource, T> {
+    extends AbstractInstanceCreator<ConfigSource, T>
+    implements ConfigSourceCreator {
 
     /**
      * Tells whether warning should be logged when config source will try to read non-existing config location.

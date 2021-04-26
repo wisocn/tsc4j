@@ -23,7 +23,9 @@ import com.github.tsc4j.core.AbstractConfigSource
 import com.github.tsc4j.core.AbstractConfigSourceSpec
 import com.github.tsc4j.core.ConfigQuery
 import com.github.tsc4j.core.ConfigSourceBuilder
+import com.github.tsc4j.core.ConfigSourceCreator
 import com.github.tsc4j.core.Tsc4j
+import com.github.tsc4j.core.creation.InstanceCreators
 import com.typesafe.config.ConfigFactory
 import groovy.util.logging.Slf4j
 import org.junit.Rule
@@ -48,6 +50,16 @@ class URLConfigSourceSpec extends AbstractConfigSourceSpec {
 
     @Rule
     WireMockRule wiremockRule = new WireMockRule(wiremockOpts, false)
+
+    def "creator should be discoverable for implementation type: #impl"() {
+        expect:
+        InstanceCreators.loadInstanceCreator(ConfigSourceCreator, impl) instanceof URLConfigSource.Builder
+
+        where:
+        impl << [
+            'url', 'URl', 'URLConfigSource', 'com.github.tsc4j.core.impl.URLConfigSource'
+        ]
+    }
 
     def "should fetch correct urls and produce expected config"() {
         given:

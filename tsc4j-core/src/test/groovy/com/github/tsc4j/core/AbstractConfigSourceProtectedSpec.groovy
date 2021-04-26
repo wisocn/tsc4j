@@ -203,8 +203,28 @@ class AbstractConfigSourceProtectedSpec extends Specification {
                boolean failOnMissing = false) {
         def builder = new ConfigSourceBuilder() {
             @Override
+            String type() {
+                return null
+            }
+
+            @Override
+            String description() {
+                return null
+            }
+
+            @Override
+            Class creates() {
+                return null
+            }
+
+            @Override
             ConfigSource build() {
                 return null
+            }
+
+            @Override
+            int compareTo(Object o) {
+                return 0
             }
         }
         builder.setAllowErrors(allowErrors).setWarnOnMissing(warnOnMissing).setFailOnMissing(failOnMissing)

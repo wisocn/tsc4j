@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -189,6 +190,11 @@ public final class ClasspathConfigSource extends FilesystemLikeConfigSource<Stri
         @Override
         public String type() {
             return "classpath";
+        }
+
+        @Override
+        public Set<String> typeAliases() {
+            return Tsc4jImplUtils.unmodifiableSet("cp");
         }
 
         @Override

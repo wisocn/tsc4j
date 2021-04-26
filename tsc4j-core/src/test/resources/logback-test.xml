@@ -41,6 +41,7 @@
   <!--logger name="com.github.tsc4j.core.impl.Tsc4jCache" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.Tsc4jImplUtils" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.ConfigValueProviderConfigTransformer" level="TRACE" /-->
+  <!--logger name="com.github.tsc4j.core.impl.SvcLoader" level="TRACE" /-->
 
   <!--logger name="com.github.tsc4j.core.ReflectiveBeanMapper" level="TRACE" /-->
   <logger name="com.github.tsc4j.core.ReflectiveBeanMapper" level="DEBUG" />

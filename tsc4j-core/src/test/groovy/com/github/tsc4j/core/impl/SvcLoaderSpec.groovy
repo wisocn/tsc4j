@@ -20,6 +20,8 @@ import groovy.util.logging.Slf4j
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.util.stream.Collectors
+
 @Slf4j
 @Unroll
 class SvcLoaderSpec extends Specification {
@@ -33,9 +35,10 @@ class SvcLoaderSpec extends Specification {
 
         where:
         action << [
-            { SvcLoader.first(null) },
             { SvcLoader.unorderedStream(null) },
-            { SvcLoader.get(null) },
+            { SvcLoader.orderedStream(null) },
+            { SvcLoader.first(null) },
+            { SvcLoader.load(null) },
         ]
     }
 
@@ -48,9 +51,8 @@ class SvcLoaderSpec extends Specification {
 
         where:
         action << [
-            { SvcLoader.first(String) },
-            // { SvcLoader.stream(String) }, // stream doesn't have isEmpty()
-            { SvcLoader.get(String) },
+            { SvcLoader.first(InterfaceWithoutImpls) },
+            { SvcLoader.load(InterfaceWithoutImpls) },
         ]
     }
 
@@ -75,9 +77,9 @@ class SvcLoaderSpec extends Specification {
         instances[1] instanceof FooImpl // because of alphanum classname sorting
     }
 
-    def "get() should return two implementations with correct order"() {
+    def "load() should return two implementations with correct order"() {
         when:
-        def instances = SvcLoader.get(MyInterface)
+        def instances = SvcLoader.load(MyInterface)
 
         then:
         instances.size() == 2
@@ -86,9 +88,9 @@ class SvcLoaderSpec extends Specification {
         instances[1] instanceof FooImpl // because of alphanum classname sorting
     }
 
-    def "get() should return NOT return singleton service instances"() {
+    def "load() should return NOT return singleton service instances"() {
         when:
-        def results = (1..10).collect { SvcLoader.get(MyInterface) }
+        def results = (1..10).collect { SvcLoader.load(MyInterface) }
         def last = results.pop()
 
         then:
@@ -104,6 +106,8 @@ class SvcLoaderSpec extends Specification {
 interface MyInterface {
     String hello()
 }
+
+interface InterfaceWithoutImpls {}
 
 class FooImpl implements MyInterface {
     @Override

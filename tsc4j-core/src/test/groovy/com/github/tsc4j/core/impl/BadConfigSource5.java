@@ -53,6 +53,21 @@ public class BadConfigSource5 implements ConfigSource {
         }
 
         @Override
+        public String type() {
+            return "bad5";
+        }
+
+        @Override
+        public String description() {
+            return "";
+        }
+
+        @Override
+        public Class<? extends ConfigSource> creates() {
+            return BadConfigSource5.class;
+        }
+
+        @Override
         public ConfigSource build() {
             return null;
         }

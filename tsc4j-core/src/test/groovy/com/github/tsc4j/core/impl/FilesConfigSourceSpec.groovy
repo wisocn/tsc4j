@@ -19,17 +19,31 @@ package com.github.tsc4j.core.impl
 
 import com.github.tsc4j.core.AbstractConfigSource
 import com.github.tsc4j.core.ConfigSourceBuilder
+import com.github.tsc4j.core.ConfigSourceCreator
 import com.github.tsc4j.core.FilesystemLikeConfigSourceSpec
+import com.github.tsc4j.core.creation.InstanceCreators
 import groovy.util.logging.Slf4j
 import spock.lang.Shared
+import spock.lang.Unroll
 
 @Slf4j
+@Unroll
 class FilesConfigSourceSpec extends FilesystemLikeConfigSourceSpec {
     @Shared
     def classpathConfigDir = "/bundled_config"
 
     def createTmpDirAndCopyConfigs() {
         copyFromClasspathToTmpDirRecursive(classpathConfigDir)
+    }
+
+    def "creator should be discoverable for implementation type: #impl"() {
+        expect:
+        InstanceCreators.loadInstanceCreator(ConfigSourceCreator, impl) instanceof FilesConfigSource.Builder
+
+        where:
+        impl << [
+            'files', 'file', 'FilesConfigSource', 'com.github.tsc4j.core.impl.FilesConfigSource'
+        ]
     }
 
     def "build should throw in case of no config names"() {

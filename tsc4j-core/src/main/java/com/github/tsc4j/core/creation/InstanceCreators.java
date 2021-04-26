@@ -16,6 +16,7 @@
 
 package com.github.tsc4j.core.creation;
 
+import com.github.tsc4j.core.Tsc4jException;
 import com.github.tsc4j.core.Tsc4jImplUtils;
 import com.github.tsc4j.core.impl.SvcLoader;
 import com.typesafe.config.Config;
@@ -352,7 +353,7 @@ public class InstanceCreators {
                     return null;
                 }
             })
-            .takeWhile(Objects::nonNull)
+            .filter(Objects::nonNull)
             .forEach(it -> log.debug("successfully created named instance: {}", it));
 
         // did any creation failed?
@@ -360,10 +361,8 @@ public class InstanceCreators {
             // close all successfully created instances so far if they implement AutoCloseable/Closeable
             if (!created.isEmpty()) {
                 log.debug("exception and there are created instance: {}", created);
-                created.values().stream()
-                    .filter(it -> it instanceof Closeable)
-                    .map(it -> (Closeable) it)
-                    .forEach(it -> Tsc4jImplUtils.close(it, log));
+                val c = created.values();
+                closeInstances(c);
             }
 
             // re-throw exception
@@ -371,6 +370,13 @@ public class InstanceCreators {
         }
 
         return created;
+    }
+
+    private <B> void closeInstances(Collection<B> c) {
+        c.stream()
+            .filter(it -> it instanceof Closeable)
+            .map(it -> (Closeable) it)
+            .forEach(it -> Tsc4jImplUtils.close(it, log));
     }
 
     private static <B, T extends InstanceCreator<B>> B createNamedInstance(Class<T> creatorType,
@@ -396,7 +402,7 @@ public class InstanceCreators {
 
             return createdInstance;
         } catch (Exception e) {
-            throw Exceptions.of("Error creating instance (implementation: %s, config %s): %s",
+            throw Tsc4jException.of("Error creating instance (implementation: %s, config %s): %s",
                 e, implName, name, e.getMessage());
         }
     }
@@ -426,7 +432,7 @@ public class InstanceCreators {
      * @return true/false
      */
     public boolean isEnabledConfig(Config config) {
-        if (config == null || config.isEmpty() || getImplementationName(config).isEmpty()) {
+        if (config == null || config.isEmpty() || !getImplementationName(config).isPresent()) {
             return false;
         }
         return config.hasPath(PATH_ENABLED) ? config.getBoolean(PATH_ENABLED) : true;

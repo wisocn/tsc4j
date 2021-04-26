@@ -335,7 +335,7 @@ public class Tsc4jImplUtils {
         return close(closeable, log);
     }
 
-    public boolean close(Collection<AutoCloseable> closeables, @NonNull Logger log) {
+    public void close(Collection<AutoCloseable> closeables, @NonNull Logger log) {
         closeables.forEach(it -> close(it, log));
     }
 
@@ -1095,28 +1095,30 @@ public class Tsc4jImplUtils {
             return Optional.empty();
         }
 
+        return Optional.empty();
+
         // is this optional config? if it is we're going to return empty optional
         // in case of exceptions, but if it's not we're going to throw exception if we didn't
         // initialized it
-        val isOptional = isOptional(config);
-
-        try {
-            val instanceOpt = implOpt
-                .flatMap(impl -> getLoader(clazz, impl))
-                .map(loader -> createConfiguredInstanceFromLoader(loader, config, cfgNum));
-            return checkInstancePresence(instanceOpt, isOptional, clazz, config, cfgNum);
-        } catch (Tsc4jException e) {
-            throw e;
-        } catch (Exception e) {
-            if (isOptional) {
-                log.warn("error creating optional {} #{}: {}", clazz.getSimpleName(), cfgNum, e.getMessage(), e);
-                return Optional.empty();
-            } else {
-                throw Tsc4jException.of("Error creating %s #%d: %%s", e, clazz.getSimpleName(), cfgNum);
-            }
-        }
+//        val isOptional = isOptional(config);
+//
+//        try {
+//            val instanceOpt = implOpt
+//                .flatMap(impl -> getLoader(clazz, impl))
+//                .map(loader -> createConfiguredInstanceFromLoader(loader, config, cfgNum));
+//            return checkInstancePresence(instanceOpt, isOptional, clazz, config, cfgNum);
+//        } catch (Tsc4jException e) {
+//            throw e;
+//        } catch (Exception e) {
+//            if (isOptional) {
+//                log.warn("error creating optional {} #{}: {}", clazz.getSimpleName(), cfgNum, e.getMessage(), e);
+//                return Optional.empty();
+//            } else {
+//                throw Tsc4jException.of("Error creating %s #%d: %%s", e, clazz.getSimpleName(), cfgNum);
+//            }
+//        }
     }
-
+/*
     @SuppressWarnings("unchecked")
     private static <T> T createConfiguredInstanceFromLoader(Tsc4jLoader<T> loader, Config config, int cfgNum) {
         // can this loader create final instance?
@@ -1145,6 +1147,7 @@ public class Tsc4jImplUtils {
         // create instance
         return builder.build();
     }
+ */
 
     private static <T> Optional<T> checkInstancePresence(Optional<T> instanceOpt,
                                                          boolean isOptional,
@@ -1419,54 +1422,54 @@ public class Tsc4jImplUtils {
         return sanitizeEnvs(x);
     }
 
-    /**
-     * Returns list of available config source loaders.
-     *
-     * @return list of loaders
-     */
-    public List<Tsc4jLoader<ConfigSource>> availableSources() {
-        return getAvailableImplementations(ConfigSource.class);
-    }
-
-    /**
-     * Returns list of available config transformer loaders.
-     *
-     * @return list of loaders
-     */
-    public List<Tsc4jLoader<ConfigTransformer>> availableTransformers() {
-        return getAvailableImplementations(ConfigTransformer.class);
-    }
-
-    /**
-     * Returns list of available config value provider loaders.
-     *
-     * @return list of loaders
-     */
-    public List<Tsc4jLoader<ConfigValueProvider>> availableValueProviders() {
-        return getAvailableImplementations(ConfigValueProvider.class);
-    }
-
-    public <T> Optional<Tsc4jLoader<T>> getLoader(@NonNull Class<T> clazz, @NonNull String impl) {
-        return getAvailableImplementations(clazz).stream()
-            .filter(loader -> loader.supports(impl))
-            .findFirst();
-    }
-
-    /**
-     * Returns list of available {@link Tsc4jLoader} implementations that can construct given class.
-     *
-     * @param clazz class for which loader can create instances.
-     * @param <T>   instance type
-     * @return list of given implementations.
-     */
-    @SuppressWarnings("unchecked")
-    private <T> List<Tsc4jLoader<T>> getAvailableImplementations(@NonNull Class<T> clazz) {
-        return loadImplementations(Tsc4jLoader.class).stream()
-            .filter(loader -> clazz.isAssignableFrom(loader.forClass()))
-            .map(loader -> (Tsc4jLoader<T>) loader)
-            .sorted()
-            .collect(Collectors.toList());
-    }
+//    /**
+//     * Returns list of available config source loaders.
+//     *
+//     * @return list of loaders
+//     */
+//    public List<Tsc4jLoader<ConfigSource>> availableSources() {
+//        return getAvailableImplementations(ConfigSource.class);
+//    }
+//
+//    /**
+//     * Returns list of available config transformer loaders.
+//     *
+//     * @return list of loaders
+//     */
+//    public List<Tsc4jLoader<ConfigTransformer>> availableTransformers() {
+//        return getAvailableImplementations(ConfigTransformer.class);
+//    }
+//
+//    /**
+//     * Returns list of available config value provider loaders.
+//     *
+//     * @return list of loaders
+//     */
+//    public List<Tsc4jLoader<ConfigValueProvider>> availableValueProviders() {
+//        return getAvailableImplementations(ConfigValueProvider.class);
+//    }
+//
+//    public <T> Optional<Tsc4jLoader<T>> getLoader(@NonNull Class<T> clazz, @NonNull String impl) {
+//        return getAvailableImplementations(clazz).stream()
+//            .filter(loader -> loader.supports(impl))
+//            .findFirst();
+//    }
+//
+//    /**
+//     * Returns list of available {@link Tsc4jLoader} implementations that can construct given class.
+//     *
+//     * @param clazz class for which loader can create instances.
+//     * @param <T>   instance type
+//     * @return list of given implementations.
+//     */
+//    @SuppressWarnings("unchecked")
+//    private <T> List<Tsc4jLoader<T>> getAvailableImplementations(@NonNull Class<T> clazz) {
+//        return loadImplementations(Tsc4jLoader.class).stream()
+//            .filter(loader -> clazz.isAssignableFrom(loader.forClass()))
+//            .map(loader -> (Tsc4jLoader<T>) loader)
+//            .sorted()
+//            .collect(Collectors.toList());
+//    }
 
     public <T extends InstanceCreator<?>> List<T> availableImplementations(@NonNull Class<T> clazz) {
         return SvcLoader.load(clazz);

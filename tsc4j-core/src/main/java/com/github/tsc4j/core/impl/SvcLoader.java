@@ -53,7 +53,7 @@ public class SvcLoader {
         }
 
         if (a instanceof Comparable && b instanceof Comparable) {
-            return ((Comparable) a).compareTo((Comparable) b);
+            return ((Comparable) a).compareTo(b);
         }
 
         return a.getClass().getName().compareTo(b.getClass().getName());
@@ -112,7 +112,7 @@ public class SvcLoader {
      * @see #unorderedStream(Class)
      */
     public <T> Stream<T> orderedStream(@NonNull Class<T> serviceClass) {
-        return orderedStream(serviceClass).sorted((Comparator<? super T>) COMPARATOR);
+        return unorderedStream(serviceClass).sorted((Comparator<? super T>) COMPARATOR);
     }
 
 
@@ -133,9 +133,10 @@ public class SvcLoader {
     }
 
     @RequiredArgsConstructor
-    private static class LazyIterator<T> implements Iterator<T> {
+    private static final class LazyIterator<T> implements Iterator<T> {
         @NonNull
         private final Iterator<T> delegate;
+
         @NonNull
         private final Class<T> service;
 

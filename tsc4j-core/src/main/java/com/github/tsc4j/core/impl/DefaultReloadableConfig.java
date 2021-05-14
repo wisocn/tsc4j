@@ -148,6 +148,8 @@ public final class DefaultReloadableConfig extends AbstractReloadableConfig {
 
     @Override
     protected void doClose() {
+        log.warn("closing {}@{}", getClass().getName(), hashCode());
+
         // cancel refresh ticker
         if (refreshTicker != null) {
             if (!refreshTicker.cancel(true)) {

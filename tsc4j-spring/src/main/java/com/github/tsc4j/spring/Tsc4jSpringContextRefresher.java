@@ -74,6 +74,7 @@ class Tsc4jSpringContextRefresher extends CloseableInstance implements Environme
 
     @Override
     protected void doClose() {
+        log.warn("closing {}@{}", getClass().getName(), hashCode());
         reloadable.close();
     }
 

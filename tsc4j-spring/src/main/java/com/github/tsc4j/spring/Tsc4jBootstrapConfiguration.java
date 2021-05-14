@@ -16,6 +16,7 @@
 
 package com.github.tsc4j.spring;
 
+import com.github.tsc4j.core.CloseableInstance;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -29,7 +30,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import javax.annotation.PreDestroy;
 import java.util.Objects;
 
 /**
@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-public class Tsc4jBootstrapConfiguration {
+public class Tsc4jBootstrapConfiguration extends CloseableInstance {
 
     /**
      * Configurable spring environment
@@ -64,8 +64,17 @@ public class Tsc4jBootstrapConfiguration {
         return locator;
     }
 
-    @PreDestroy
-    void close() {
+//    @Override
+//    @PreDestroy
+//    void close() {
+//        SpringUtils.instanceHolder().close();
+//    }
+
+
+    @Override
+    protected void doClose() {
+        log.warn("closing {}@{}", getClass().getName(), hashCode());
+
         SpringUtils.instanceHolder().close();
     }
 }

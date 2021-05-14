@@ -50,6 +50,8 @@ class SampleApp {
 
     @PostConstruct
     void init() {
+        return;
+        
         log.info("{} init()", this)
         log.info("Using reloadable config: {}", reloadableConfig)
         log.info("Using config:            {}", config)

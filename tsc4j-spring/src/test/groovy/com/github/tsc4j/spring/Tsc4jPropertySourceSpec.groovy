@@ -258,7 +258,7 @@ class Tsc4jPropertySourceSpec extends Specification {
         where:
         name                           | expected
         'a'                            | 'b'
-        'b'                            | 10
+        'b'                            | '10'
         'bar'                          | 'baz'
 
         'non.existent'                 | null
@@ -268,10 +268,10 @@ class Tsc4jPropertySourceSpec extends Specification {
 
         'foo.bar:someDef'              | 'something'
         'foo.bar'                      | 'something'
-        'foo.list'                     | [1, 2, 3]
-        'foo.list[0]'                  | 1
-        'foo.list[1]'                  | 2
-        'foo.list[2]'                  | 3
+        'foo.list'                     | ['1', '2', '3']
+        'foo.list[0]'                  | '1'
+        'foo.list[1]'                  | '2'
+        'foo.list[2]'                  | '3'
 
         'foo.list[3]'                  | null
         '@appId'                       | null

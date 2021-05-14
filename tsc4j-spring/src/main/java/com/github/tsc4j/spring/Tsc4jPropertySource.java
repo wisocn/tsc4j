@@ -124,12 +124,15 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
     @Override
     public Object getProperty(@NonNull String name) {
         val config = waitForConfigFetch();
-        return Tsc4jImplUtils.getPropertyFromConfig(name, config);
+        val result = Tsc4jImplUtils.getPropertyFromConfig(name, config);
+        return (result != null) ? result.toString() : null;
     }
 
     @PreDestroy
     @Override
     public void close() {
+        log.warn("closing {}@{}", getClass().getName(), hashCode());
+
         log.debug("{} closing property source.", this);
         reloadable.close();
     }

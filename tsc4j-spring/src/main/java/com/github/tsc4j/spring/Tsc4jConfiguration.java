@@ -167,6 +167,8 @@ public class Tsc4jConfiguration {
 
     @PreDestroy
     void close() {
+        log.warn("closing {}@{}", getClass().getName(), hashCode());
+
         SpringUtils.instanceHolder().close();
     }
 }

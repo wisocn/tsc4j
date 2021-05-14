@@ -62,6 +62,8 @@ public abstract class CloseableInstance implements Closeable {
     @Override
     @PreDestroy
     public final void close() {
+        log.warn("XXX closing {}@{}", getClass().getName(), hashCode());
+
         if (!closed.compareAndSet(false, true)) {
             log.warn("{} attempting to close already closed instance.", this, new IllegalStateException("stacktrace"));
             return;

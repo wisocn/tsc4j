@@ -8,5 +8,20 @@ spring:
 
 something.from.app.yml: 42
 
+some.list:
+  - a
+  - b
+  - b
+  - c
+  - "null"
+  - null
+  - d
+  - 39
+  - ' 39 '
+
+some.map:
+  foo: bar
+  bar: baz
+
 # vim:shiftwidth=2 softtabstop=2 expandtab
 # EOF

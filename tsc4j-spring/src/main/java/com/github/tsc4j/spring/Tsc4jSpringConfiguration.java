@@ -37,7 +37,7 @@ import javax.annotation.PreDestroy;
  */
 @Slf4j
 @Configuration
-public class Tsc4jConfiguration {
+public class Tsc4jSpringConfiguration {
     private final CloseableReloadableConfig reloadableConfig;
 
     /**
@@ -46,7 +46,7 @@ public class Tsc4jConfiguration {
      * @param env spring configurable environment
      */
     @Autowired
-    public Tsc4jConfiguration(@NonNull ConfigurableEnvironment env) {
+    public Tsc4jSpringConfiguration(@NonNull ConfigurableEnvironment env) {
         this.reloadableConfig = SpringUtils.reloadableConfig(env);
         createAndRegisterTsc4jPropertySource(this.reloadableConfig, env);
     }

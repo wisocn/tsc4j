@@ -27,7 +27,6 @@ class Constants {
     /**
      * Spring boolean property defining whether tsc4j is enabled (value: <b>{@value}</b>)
      *
-     * @see Tsc4jBootstrapConfiguration#tsc4jPropertySourceLocator(String)
      * @see org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
      */
     static final String PROPERTY_ENABLED = PREFIX + "enabled";
@@ -37,7 +36,7 @@ class Constants {
      * (value:
      * <b>{@value}</b>)
      *
-     * @see Tsc4jContextRefreshConfiguration
+     * @see Tsc4jContextRefreshSpringConfiguration
      * @see org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
      */
     static final String PROPERTY_REFRESH_CONTEXT = PREFIX + "refresh.enabled";

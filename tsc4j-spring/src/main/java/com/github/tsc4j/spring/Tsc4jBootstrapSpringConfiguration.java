@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-public class Tsc4jBootstrapConfiguration {
+public class Tsc4jBootstrapSpringConfiguration {
 
     /**
      * Configurable spring environment

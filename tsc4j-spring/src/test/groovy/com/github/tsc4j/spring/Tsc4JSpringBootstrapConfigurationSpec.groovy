@@ -18,7 +18,7 @@ package com.github.tsc4j.spring
 
 import spock.lang.Specification
 
-class Tsc4jBootstrapConfigurationSpec extends Specification {
+class Tsc4JSpringBootstrapConfigurationSpec extends Specification {
     def setupSpec() {
         cleanupSpec()
     }

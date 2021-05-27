@@ -19,46 +19,43 @@ package com.github.tsc4j.spring
 
 import com.github.tsc4j.api.ReloadableConfig
 import com.typesafe.config.Config
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+import spock.lang.Unroll
 
 import javax.inject.Inject
 
-class Tsc4jConfigurationSpec extends SpringSpec {
+@Unroll
+class Tsc4JSpringConfigurationSpec extends SpringSpec {
+    // ensure that @Inject to works as well
     @Inject
     ApplicationContext ctx
 
-    @Inject
+    @Autowired
     ReloadableConfig reloadableConfig
 
-    @Inject
+    @Autowired
     Config config
 
-    def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
-    }
-
-    def 'context should be wired'() {
+    def "should wire dependencies"() {
         expect:
         ctx != null
-    }
-
-    def "reloadable config should be wired"() {
-        expect:
         reloadableConfig != null
+        config != null
     }
 
-    def "reloadable config should be singleton"() {
+    def "application context should provide singleton of #clazz"() {
         when:
-        def rcs = (1..100).collect({ ctx.getBean(ReloadableConfig) })
+        def beans = (1..100).collect({ ctx.getBean(clazz) })
+        def first = beans.first()
 
         then:
-        rcs.every({ reloadableConfig == it })
-        rcs.every({ it.is(reloadableConfig) })
-    }
+        first != null
+        beans.every({ it.is(first) })
+        beans.every({ it == first })
 
-    def "config should be wired"() {
-        expect:
-        config != null
+        where:
+        clazz << [ReloadableConfig, Tsc4jSpringContextRefresher, Tsc4jHealthIndicator]
     }
 
     def "config should be the same until reloadable doesn't reload config"() {

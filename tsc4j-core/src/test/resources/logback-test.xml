@@ -33,7 +33,7 @@
   <!--logger name="com.github.tsc4j.core.impl.Rot13ConfigTransformer" level="DEBUG" /-->
   <!--logger name="com.github.tsc4j.core.impl.TscBeanFactory" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.ConfigImplUtils" level="TRACE" /-->
-  <logger name="com.github.tsc4j.core.impl.ClasspathConfigSource" level="TRACE" />
+  <!--logger name="com.github.tsc4j.core.impl.ClasspathConfigSource" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.tsc4j" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.credstash" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.FilesConfigSource" level="TRACE" /-->
@@ -43,23 +43,22 @@
   <!--logger name="com.github.tsc4j.core.impl.ConfigValueProviderConfigTransformer" level="TRACE" /-->
 
   <!--logger name="com.github.tsc4j.core.ReflectiveBeanMapper" level="TRACE" /-->
-  <logger name="com.github.tsc4j.core.ReflectiveBeanMapper" level="DEBUG" />
-  <logger name="com.github.tsc4j.jackson" level="TRACE" />
+  <!--logger name="com.github.tsc4j.core.ReflectiveBeanMapper" level="DEBUG" /-->
+  <!--logger name="com.github.tsc4j.jackson" level="TRACE" /-->
 
   <!-- aws stuff -->
   <!--logger name="com.github.tsc4j.s3" level="TRACE" /-->
   <logger name="s3mock-akka" level="OFF" />
   <logger name="s3mock-akka.akka" level="OFF" />
   <logger name="com.amazonaws.util.EC2MetadataUtils" level="ERROR" />
-  <logger name="com.github.tsc4j.aws" level="DEBUG" />
+  <!--logger name="com.github.tsc4j.aws" level="DEBUG" /-->
 
   <!-- gcp stuff -->
-  <logger name="com.github.tsc4j.gcp" level="TRACE" />
+  <!--logger name="com.github.tsc4j.gcp" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.core.impl.ConfigValueProviderConfigTransformer" level="DEBUG" /-->
 
   <!--spring stuff -->
-  <logger name="com.github.tsc4j.spring" level="TRACE" />
-  <logger name="com.github.tsc4j.core.Tsc4jImplUtils" level="TRACE" />
+  <!--logger name="com.github.tsc4j.spring" level="TRACE" /-->
 
   <!--logger name="io.micronaut" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.micronaut.Tsc4jPropertySource" level="TRACE" /-->

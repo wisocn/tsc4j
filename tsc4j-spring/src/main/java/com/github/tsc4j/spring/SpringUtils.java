@@ -236,7 +236,7 @@ class SpringUtils {
     }
 
     String getDefaultValueFromPropertyName(String name) {
-        val startIdx = name.indexOf(':') + 1;
+        val startIdx = name.lastIndexOf(':') + 1;
         if (startIdx >= 1 && startIdx <= name.length()) {
             return name.substring(startIdx);
         }
@@ -244,7 +244,7 @@ class SpringUtils {
     }
 
     String removeDefaultValueFromPropertyName(String key) {
-        val idx = key.indexOf(':');
+        val idx = key.lastIndexOf(':');
         return (idx < 0) ? key : key.substring(0, idx);
     }
 

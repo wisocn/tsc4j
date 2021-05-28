@@ -59,7 +59,7 @@
 
   <!--spring stuff -->
   <!--logger name="com.github.tsc4j.spring" level="TRACE" /-->
-  <logger name="com.github.tsc4j.spring.Tsc4jPropertySource" level="TRACE" />
+  <!--logger name="com.github.tsc4j.spring.Tsc4jPropertySource" level="TRACE" /-->
 
   <!--logger name="io.micronaut" level="TRACE" /-->
   <!--logger name="com.github.tsc4j.micronaut.Tsc4jPropertySource" level="TRACE" /-->

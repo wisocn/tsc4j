@@ -50,6 +50,71 @@ abstract class AbstractReloadableSpec extends BaseSpec {
         thrown(NoSuchElementException)
     }
 
+    def "orElse() should allow nulls to be passed"() {
+        when:
+        def res = emptyReloadable().orElse(null)
+
+        then:
+        noExceptionThrown()
+        res == null
+    }
+
+    def "orElse() should return argument on empty reloadable"() {
+        given:
+        def defaultValue = 'default-value'
+        def reloadable = emptyReloadable()
+
+        expect:
+        reloadable.orElse(defaultValue).is(defaultValue)
+    }
+
+    def "orElse() should return stored value on non-empty reloadable"() {
+        given:
+        def defaultValue = 'default-value'
+        def rValue = 'foo'
+        def reloadable = createReloadable(rValue)
+
+        expect:
+        reloadable.orElse(defaultValue) == rValue
+    }
+
+    def "orElseGet() should not allow null suppliers"() {
+        when:
+        def res = emptyReloadable().orElseGet(null)
+
+        then:
+        thrown(NullPointerException)
+        res == null
+    }
+
+    def "orElseGet() should return supplier's generated value on empty reloadable"() {
+        given:
+        def defaultValue = 'default-value'
+        def reloadable = emptyReloadable()
+
+        expect:
+        reloadable.orElseGet({ defaultValue }).is(defaultValue)
+    }
+
+    def "orElseGet() should return null if supplier returns null"() {
+        given:
+        def reloadable = emptyReloadable()
+
+        expect:
+        reloadable.orElseGet({ null }) == null
+    }
+
+    def "orElseGet() should return stored value on non-empty reloadable"() {
+        given:
+        def defaultValue = 'default-value'
+        def rValue = 'foo'
+        def reloadable = createReloadable(rValue)
+
+        expect:
+        reloadable.orElseGet({ defaultValue }) == rValue
+    }
+
+
     def "non-empty reloadable should contain value"() {
         given:
         def reloadable = createReloadable("foo")

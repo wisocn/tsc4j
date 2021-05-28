@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Base class for writing {@link Reloadable} aliases
@@ -48,14 +49,34 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      */
     private volatile T value;
 
+    /**
+     * Fetches current stored value.
+     *
+     * @return current stored value, might be null.
+     */
+    protected final T fetchValue() {
+        return value;
+    }
+
+    /**
+     * Clears current stored value.
+     *
+     * @return optional of previously stored value.
+     */
+    protected final Optional<T> clearValue() {
+        val result = Optional.ofNullable(fetchValue());
+        value = null;
+        return result;
+    }
+
     @Override
     public final boolean isPresent() {
-        return value != null;
+        return fetchValue() != null;
     }
 
     @Override
     public final T get() {
-        val value = this.value;
+        val value = fetchValue();
         if (value == null) {
             throw new NoSuchElementException("Value is not present.");
         }
@@ -63,8 +84,20 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     @Override
+    public final T orElse(T other) {
+        val value = fetchValue();
+        return (value == null) ? other : value;
+    }
+
+    @Override
+    public final T orElseGet(@NonNull Supplier<T> supplier) {
+        val value = fetchValue();
+        return (value == null) ? supplier.get() : value;
+    }
+
+    @Override
     public final Reloadable<T> ifPresent(@NonNull Consumer<T> consumer) {
-        val value = this.value;
+        val value = fetchValue();
         if (value != null) {
             consumer.accept(value);
         }
@@ -82,7 +115,7 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(present=" + isPresent() + ", updates=" + numUpdates + ")";
+        return getClass().getSimpleName() + "[present=" + isPresent() + ", updates=" + numUpdates + "]";
     }
 
     /**
@@ -96,7 +129,7 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      */
     protected final Reloadable<T> setValue(@NonNull T value) {
         checkClosed();
-        val oldValue = this.value;
+        val oldValue = fetchValue();
 
         // assign new value only if it differs from previous one
         if (!(oldValue == value || value.equals(oldValue))) {
@@ -115,8 +148,8 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      */
     protected final Optional<T> removeValue() {
         checkClosed();
-        val value = this.value;
-        this.value = null;
+        val value = fetchValue();
+        clearValue();
 
         // run update consumers only if value was previously present
         if (value != null) {
@@ -132,7 +165,7 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      * @see #register(Consumer)
      */
     protected final void runOnUpdate() {
-        val value = this.value;
+        val value = fetchValue();
         onUpdate.forEach(consumer -> Tsc4jImplUtils.safeRunnable(() -> consumer.accept(value)).run());
         numUpdates.incrementAndGet();
     }
@@ -163,7 +196,7 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
 
     @Override
     protected void doClose() {
-        this.value = null;
+        clearValue();
         onUpdate.clear();
     }
 }

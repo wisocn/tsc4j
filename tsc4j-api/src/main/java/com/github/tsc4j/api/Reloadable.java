@@ -56,9 +56,30 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
      * @throws java.util.NoSuchElementException if value is not present.
      * @see #isPresent()
      * @see #isEmpty()
+     * @see #orElse(Object)
+     * @see #orElseGet(Supplier)
      */
     @Override
     T get();
+
+
+    /**
+     * Returns reloadable's stored value if it's present, otherwise returns {@code other}.
+     *
+     * @param other other value that should be returned if reloadable is empty.
+     * @return reloadable's stored value if it's present, otherwise {@code other}.
+     * @see #isPresent()
+     * @see #isEmpty()
+     */
+    T orElse(T other);
+
+    /**
+     * Returns reloadable's stored value if it's present, otherwise returns value supplied by {@code supplier}.
+     *
+     * @param supplier the supplying function that produces a value to be returned if reloadable is empty.
+     * @return reloadable's stored value if it's present, otherwise result of {@code supplier}.
+     */
+    T orElseGet(@NonNull Supplier<T> supplier);
 
     /**
      * Invokes specified consumer if value is present.

@@ -1,10 +1,12 @@
 package com.github.tsc4j.api
 
 import groovy.util.logging.Slf4j
+import lombok.NonNull
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 @Slf4j
 @Unroll
@@ -48,6 +50,16 @@ class ReloadableSpec extends Specification {
         @Override
         Object get() {
             return value
+        }
+
+        @Override
+        Object orElse(Object other) {
+            null
+        }
+
+        @Override
+        Object orElseGet(@NonNull Supplier supplier) {
+            null
         }
 
         @Override

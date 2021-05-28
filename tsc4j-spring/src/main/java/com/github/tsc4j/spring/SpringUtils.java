@@ -262,7 +262,6 @@ class SpringUtils {
             if (value instanceof List) {
                 val list = (List) value;
                 val idx = getPropertyNameListIndex(name);
-                log.debug("  list index: {}", idx);
                 if (idx >= 0 && idx < list.size()) {
                     r = list.get(idx);
                 } else {

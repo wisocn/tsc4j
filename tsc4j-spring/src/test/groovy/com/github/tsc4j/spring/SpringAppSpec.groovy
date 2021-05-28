@@ -39,14 +39,6 @@ class SpringAppSpec extends SpringSpec {
     @Autowired
     Tsc4jHealthIndicator healthIndicator
 
-    def setupSpec() {
-        cleanupSpec()
-    }
-
-    def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
-    }
-
     def "context should be wired"() {
         expect:
         ctx != null

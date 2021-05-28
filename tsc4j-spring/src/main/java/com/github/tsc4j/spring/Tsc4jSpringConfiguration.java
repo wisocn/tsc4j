@@ -17,12 +17,10 @@
 package com.github.tsc4j.spring;
 
 import com.github.tsc4j.api.ReloadableConfig;
-import com.github.tsc4j.core.CloseableReloadableConfig;
 import com.typesafe.config.Config;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -30,27 +28,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import javax.annotation.PreDestroy;
-
 /**
  * Tsc4j configuration class.
  */
 @Slf4j
 @Configuration
 public class Tsc4jSpringConfiguration {
-    private final CloseableReloadableConfig reloadableConfig;
-
-    /**
-     * Creates new instance.
-     *
-     * @param env spring configurable environment
-     */
-    @Autowired
-    public Tsc4jSpringConfiguration(@NonNull ConfigurableEnvironment env) {
-        this.reloadableConfig = SpringUtils.reloadableConfig(env);
-        createAndRegisterTsc4jPropertySource(this.reloadableConfig, env);
-    }
-
     /**
      * Provides reloadable config singleton.
      *
@@ -59,17 +42,10 @@ public class Tsc4jSpringConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ReloadableConfig reloadableConfig2() {
-        return reloadableConfig;
-    }
-
-    private ReloadableConfig reloadableConfig2(@NonNull ConfigurableEnvironment env) {
+    public ReloadableConfig reloadableConfig(@NonNull ConfigurableEnvironment env) {
         val rc = SpringUtils.reloadableConfig(env);
-
-        val propSource = createAndRegisterTsc4jPropertySource(rc, env);
-        log.warn("created and registered spring property source: {}", propSource);
-
-        log.debug("supplying reloadable config singleton: {}", rc);
+        createAndRegisterTsc4jPropertySource(rc, env);
+        log.debug("supplying reloadable config: {}", rc);
         return rc;
     }
 
@@ -85,9 +61,7 @@ public class Tsc4jSpringConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public Config config(@NonNull ReloadableConfig rc) {
         val config = rc.getSync();
-        if (config != null) {
-            log.debug("supplying config bean (hashcode: {}).", config.hashCode());
-        }
+        log.debug("supplying config bean (hashcode: {}).", config.hashCode());
         return config;
     }
 
@@ -100,10 +74,5 @@ public class Tsc4jSpringConfiguration {
         env.getPropertySources().addLast(propertySource);
 
         return propertySource;
-    }
-
-    @PreDestroy
-    void close() {
-        SpringUtils.instanceHolder().close();
     }
 }

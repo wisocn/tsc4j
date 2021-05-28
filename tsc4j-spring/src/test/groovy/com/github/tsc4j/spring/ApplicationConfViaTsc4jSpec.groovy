@@ -16,7 +16,6 @@
 
 package com.github.tsc4j.spring
 
-import com.github.tsc4j.spring.SpringSpec
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -189,7 +188,7 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
 
         then:
         component != null
-        component.hello() == 'my-super-val-37'
+        component.hello() == 'my-super-val-39'
     }
 
     @ToString(includeNames = true, includePackage = false)

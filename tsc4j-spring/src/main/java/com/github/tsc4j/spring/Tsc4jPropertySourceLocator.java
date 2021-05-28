@@ -57,15 +57,9 @@ class Tsc4jPropertySourceLocator implements PropertySourceLocator {
     }
 
     @Override
-    public PropertySource<?> locate(Environment environment) {
-        val env = getEnvironment(environment);
-        val envNames = SpringUtils.getTsc4jEnvs(env);
-        log.debug("locate(): locating property source for application '{}' with activated profiles: {}",
-            appName, envNames);
-
+    public PropertySource<?> locate(Environment env) {
         log.trace("locate(): creating reloadable config.");
-        val reloadableConfig = SpringUtils.instanceHolder().getOrCreate(
-            () -> SpringUtils.createReloadableConfig(appName, SpringUtils.getTsc4jEnvs(env)));
+        val reloadableConfig = SpringUtils.reloadableConfig(appName, SpringUtils.getTsc4jEnvs(env));
         log.debug("locate(): created reloadable config: {}", reloadableConfig);
 
         val source = new Tsc4jPropertySource(reloadableConfig);

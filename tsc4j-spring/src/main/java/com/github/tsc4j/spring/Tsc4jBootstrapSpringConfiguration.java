@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import javax.annotation.PreDestroy;
 import java.util.Objects;
 
 /**
@@ -37,8 +36,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Configuration
-public class Tsc4jBootstrapConfiguration {
-
+public class Tsc4jBootstrapSpringConfiguration {
     /**
      * Configurable spring environment
      */
@@ -62,10 +60,5 @@ public class Tsc4jBootstrapConfiguration {
         val locator = new Tsc4jPropertySourceLocator(appName, env);
         log.debug("created spring property source locator for app name {}: {}", appName, locator);
         return locator;
-    }
-
-    @PreDestroy
-    void close() {
-        SpringUtils.instanceHolder().close();
     }
 }

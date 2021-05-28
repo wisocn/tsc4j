@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.Closeable;
 import java.util.Objects;
@@ -119,18 +120,30 @@ public final class AtomicInstance<T> implements Closeable {
         return Optional.ofNullable(instance);
     }
 
-    @Override
+    /**
+     * Clears and destroys underlying instance if it exists.
+     *
+     * @return reference to itself
+     */
     @Synchronized
-    public void close() {
-        if (instance != null) {
-            try {
-                destroyer.accept(instance);
-            } catch (Throwable t) {
-                log.error("exception while destroying atomic instance {} using destroyer {}", instance, destroyer, t);
-            }
+    public AtomicInstance<T> clear() {
+        // fetch and un-assign instance
+        val i = this.instance;
+        this.instance = null;
 
-            // clear it anyway...
-            instance = null;
+        if (i != null) {
+            try {
+                destroyer.accept(i);
+            } catch (Throwable t) {
+                log.error("exception while destroying atomic instance {} using destroyer {}", i, destroyer, t);
+            }
         }
+
+        return this;
+    }
+
+    @Override
+    public void close() {
+        clear();
     }
 }

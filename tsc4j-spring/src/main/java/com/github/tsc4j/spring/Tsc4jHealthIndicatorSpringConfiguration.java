@@ -24,31 +24,27 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 @Slf4j
 @Configuration
-public class Tsc4jContextRefreshConfiguration {
+public class Tsc4jHealthIndicatorSpringConfiguration {
     /**
-     * Creates spring context refresher that refreshes spring-context when tsc4j configuration changes
+     * Creates tsc4j health indicator.
      *
-     * @param contextRefresher context refresher
      * @param reloadableConfig reloadable config
-     * @return spring context refresher
-     * @see Constants#PROPERTY_REFRESH_CONTEXT
+     * @return health indicator
      */
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     @ConditionalOnMissingBean
-    @ConditionalOnClass(ContextRefresher.class)
-    @ConditionalOnProperty(value = Constants.PROPERTY_REFRESH_CONTEXT, matchIfMissing = true)
-    public Tsc4jSpringContextRefresher tsc4jSpringContextRefresher(@NonNull ContextRefresher contextRefresher,
-                                                                   @NonNull ReloadableConfig reloadableConfig) {
-        val refresher = new Tsc4jSpringContextRefresher(contextRefresher, reloadableConfig);
-        log.debug("supplying spring-context refresher singleton: {}", refresher);
-        return refresher;
+    @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+    @ConditionalOnProperty(value = Constants.PROPERTY_ENABLED, matchIfMissing = true)
+    Tsc4jHealthIndicator tsc4jHealthIndicator(@NonNull ReloadableConfig reloadableConfig) {
+        val indicator = new Tsc4jHealthIndicator(reloadableConfig);
+        log.debug("supplying tsc4j health indicator singleton: {}", indicator);
+        return indicator;
     }
 }

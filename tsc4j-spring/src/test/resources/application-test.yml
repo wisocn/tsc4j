@@ -1,0 +1,39 @@
+#
+# application.yml
+#
+
+spring:
+  application:
+    name: appNameFromAppYml
+
+# debug bean initialization conditions
+#debug: true
+
+something.from.app.yml: 42
+
+yaml.some.list:
+  - a
+  - b
+  - b
+  - c
+  - "null"
+  - null
+  - d
+  - 39
+  - ' 39 '
+
+yaml.some:
+  bool:         true
+  int:          42
+  another-int:  "42"
+
+  feature:
+    enabled:  true
+    some-val: my-super-val-37
+
+  map:
+    foo: bar
+    bar: baz
+
+# vim:shiftwidth=2 softtabstop=2 expandtab
+# EOF

@@ -1,9 +1,9 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.tsc4j.spring.Tsc4jConfiguration
+com.github.tsc4j.spring.Tsc4jSpringConfiguration
 
 # Bootstrap components
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
-com.github.tsc4j.spring.Tsc4jBootstrapConfiguration
+com.github.tsc4j.spring.Tsc4jBootstrapSpringConfiguration
 
 # EOF

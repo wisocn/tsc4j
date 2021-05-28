@@ -32,14 +32,6 @@ class Tsc4jSpringContextRefresherSpec extends Specification {
     def reloadableConfig = Mock(ReloadableConfig)
     def ctxRefresher = Mock(ContextRefresher)
 
-    def setupSpec() {
-        cleanupSpec()
-    }
-
-    def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
-    }
-
     def "constructor should throw on null args"() {
         when:
         def refresher = new Tsc4jSpringContextRefresher(ctxRefresher, reloadableConfig)

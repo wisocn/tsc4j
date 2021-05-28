@@ -26,7 +26,7 @@ import spock.lang.Unroll
 import javax.inject.Inject
 
 @Unroll
-class Tsc4jConfigurationSpec extends SpringSpec {
+class Tsc4JSpringConfigurationSpec extends SpringSpec {
     // ensure that @Inject to works as well
     @Inject
     ApplicationContext ctx

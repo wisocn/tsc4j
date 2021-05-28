@@ -24,31 +24,28 @@ import lombok.NonNull;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.EnumerablePropertySource;
 
-import javax.annotation.PreDestroy;
 import java.io.Closeable;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Tsc4j {@link org.springframework.core.env.PropertySource} implementation.
  */
 @Slf4j
-@Order
-class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> implements Closeable, InitializingBean {
+final class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> implements Closeable, Ordered {
     // reloadable that gets notified when config changes
     private final Reloadable<Config> reloadable;
 
     /**
-     * Current config values
+     * Current spring property map
      */
-    private volatile Config currentConfig = null;
-    private volatile Set<String> currentPropertyNames;
+    private volatile Map<String, Object> springPropertyMap = null;
 
     /**
      * Creates new instance with source name <b>{@value Tsc4jImplUtils#NAME}</b>.
@@ -77,61 +74,57 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
         log.debug("created tsc4j spring property source: {}", this);
     }
 
-    @Synchronized
     private void updateCurrentConfig(Config config) {
         if (config == null) {
-            log.warn("configuration disappeared, retaining existing config.");
+            log.debug("cleared current config value map, because configuration has disappeared.");
             return;
         }
 
-        this.currentPropertyNames = Tsc4jImplUtils.propertyNames(config);
-        this.currentConfig = config;
-
-        if (log.isDebugEnabled()) {
-            log.trace("{} assigned new config object: {}", this, config);
-            log.debug("{} assigned new property names ({}): {}",
-                this, currentPropertyNames.size(), currentPropertyNames);
-        }
+        assignPropertyMap(config);
     }
 
     @Override
     public boolean containsProperty(@NonNull String name) {
-        waitForConfigFetch();
-        val idx = name.indexOf(':');
-        if (idx > 0) {
-            name = name.substring(0, idx);
-        }
-
-        val cleanName = (idx > 0) ? name.substring(0, idx) : name;
-
-        val result = currentPropertyNames.contains(cleanName);
-        log.debug("{} containsProperty() '{}/{}': {}", this, name, cleanName, result);
+        val result = waitForConfigFetch().containsKey(name);
+        log.debug("containsProperty(): {} => {}", name, result);
         return result;
     }
 
     @Override
     public String[] getPropertyNames() {
-        waitForConfigFetch();
-        val names = currentPropertyNames;
-        val result = names.toArray(new String[0]);
-        if (log.isDebugEnabled()) {
-            log.debug("{} retrieving current property name array ({} entries)", this, names.size());
-            log.trace("{} retrieving current property names: {}", this, names);
-        }
+        val map = waitForConfigFetch();
+        val keys = map.keySet();
+        val result = keys.toArray(new String[0]);
+
+        log.debug("getPropertyNames(): {}", keys);
         return result;
     }
 
     @Override
     public Object getProperty(@NonNull String name) {
-        val config = waitForConfigFetch();
-        return Tsc4jImplUtils.getPropertyFromConfig(name, config);
+        val map = waitForConfigFetch();
+        val key = SpringUtils.removeDefaultValueFromPropertyName(name);
+        val defaultValue = SpringUtils.getDefaultValueFromPropertyName(name);
+
+        Object result = map.get(key);
+        if (result == null && !defaultValue.isEmpty()) {
+            result = defaultValue;
+        }
+
+        log.trace("getProperty(): `{}` (def: `{}`) => `{}`", name, defaultValue, result);
+        return result;
     }
 
-    @PreDestroy
+    //@PreDestroy
     @Override
     public void close() {
         log.debug("{} closing property source.", this);
         reloadable.close();
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     /**
@@ -141,12 +134,13 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
      * @throws IllegalStateException if config cannot be fetched.
      * @see #updateCurrentConfig(Config)
      */
-    private Config waitForConfigFetch() {
-        val config = this.currentConfig;
-        if (config == null) {
-            return fetchConfig();
+    private Map<String, Object> waitForConfigFetch() {
+        val m = this.springPropertyMap;
+        if (m == null) {
+            return assignPropertyMap(fetchConfig());
         }
-        return config;
+
+        return m;
     }
 
     /**
@@ -161,8 +155,22 @@ class Tsc4jPropertySource extends EnumerablePropertySource<ReloadableConfig> imp
             .orElseThrow(() -> new IllegalStateException("Source returned null config."));
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        log.debug("afterPropertiesSet() invoked.");
+    private Map<String, Object> assignPropertyMap(Config config) {
+        return assignPropertyMap(SpringUtils.toSpringPropertyMap(config));
+    }
+
+    @Synchronized
+    private Map<String, Object> assignPropertyMap(@NonNull Map<String, Object> map) {
+        // assign
+        this.springPropertyMap = map;
+
+        if (log.isDebugEnabled()) {
+            val str = springPropertyMap.entrySet().stream()
+                .map(it -> "  " + it.getKey() + " => " + it.getValue().getClass().getName() + " `" + it.getValue() + "`")
+                .collect(Collectors.joining("\n"));
+            log.trace("updated current config properties:\n{}", str);
+        }
+
+        return this.springPropertyMap;
     }
 }

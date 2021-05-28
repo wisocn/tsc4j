@@ -17,7 +17,6 @@
 
 package com.github.tsc4j.spring
 
-import com.github.tsc4j.api.Reloadable
 import com.github.tsc4j.api.ReloadableConfig
 import com.github.tsc4j.test.TestReloadable
 import com.typesafe.config.ConfigFactory
@@ -41,14 +40,13 @@ class Tsc4jPropertySourceSpec extends Specification {
     def reloadable = new TestReloadable(config)
     def reloadableConfig = Mock(ReloadableConfig)
 
-    def expectedPropertyNames = ['id', 'bar', 'a', 'b', 'foo.bar', 'foo.list', 'foo.list[0]', 'foo.list[1]', 'foo.list[2]']
+    def expectedPropertyNames = ['id', 'bar', 'a', 'b', 'foo.bar', 'foo.list[0]', 'foo.list[1]', 'foo.list[2]']
 
     def setupSpec() {
         cleanupSpec()
     }
 
     def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
     }
 
     Tsc4jPropertySource newSource() {
@@ -88,21 +86,21 @@ class Tsc4jPropertySourceSpec extends Specification {
         def source = new Tsc4jPropertySource(reloadableConfig)
 
         when: "ask for current config"
-        def config = source.waitForConfigFetch()
+        def configMap = source.waitForConfigFetch()
 
         then:
         thrown(IllegalStateException)
-        config == null
+        configMap == null
 
         when: "supply config and ask for current config again"
         reloadable.set(this.config)
-        config = source.waitForConfigFetch()
+        configMap = source.waitForConfigFetch()
 
         then:
-        config.is(this.config)
+        configMap.size() > this.config.root().size()
     }
 
-    def "property fetching methods should throw ISE until configuration is not fetched"() {
+    def "property fetching methods should throw ISE until configuration is fetched"() {
         given:
         def reloadable = new TestReloadable()
         reloadableConfig.register(_) >> reloadable
@@ -138,7 +136,7 @@ class Tsc4jPropertySourceSpec extends Specification {
         !source.containsProperty("baz")
 
         source.getProperty("id") == randomId
-        source.getProperty("foo") == cfgMap["foo"]
+        source.getProperty("foo") == null
         source.getProperty("bar") == cfgMap["bar"]
         source.getProperty("baz") == null
 
@@ -155,7 +153,7 @@ class Tsc4jPropertySourceSpec extends Specification {
         !source.containsProperty("baz")
 
         source.getProperty("id") == randomId
-        source.getProperty("foo") == cfgMap["foo"]
+        source.getProperty("foo") == null
         source.getProperty("bar") == cfgMap["bar"]
         source.getProperty("baz") == null
 
@@ -180,35 +178,10 @@ class Tsc4jPropertySourceSpec extends Specification {
         source.getPropertyNames().toList().isEmpty()
     }
 
-    def "close() should close reloadable"() {
-        given:
-        def reloadable = Mock(Reloadable)
-        reloadable.ifPresentAndRegister(_) >> reloadable
-        reloadableConfig.register(_) >> reloadable
-
-        and:
-        def source = new Tsc4jPropertySource(reloadableConfig)
-
-        when:
-        source.close()
-
-        then:
-        1 * reloadable.close()
-        noExceptionThrown()
-    }
-
     def "getProperty()/containsProperty() should never throw for invalid property names"() {
-        given: "setup config"
-        def configMap = [a: 'b']
-        def config = ConfigFactory.parseMap(configMap)
-
-        and: "setup reloadable config"
-        def reloadable = new TestReloadable(config)
-        reloadableConfig.getSync() >> config
-        reloadableConfig.register(_) >> reloadable
-
-        and: "setup source"
-        def source = new Tsc4jPropertySource(reloadableConfig)
+        given: "setup config and source"
+        config = ConfigFactory.parseMap([:])
+        def source = newSource()
 
         when:
         def result = source.getProperty(name)
@@ -226,14 +199,40 @@ class Tsc4jPropertySourceSpec extends Specification {
 
         where:
         name << [
-            //null,
             '',
             '"',
             '\\',
             '/',
             '@appId',
-            'foo:bar',
             'server.compression.mime-types[0]'
+        ]
+    }
+
+    def "getProperty()/containsProperty() should return default value for unknown props"() {
+        given: "setup config and source"
+        config = ConfigFactory.parseMap([:])
+        def source = newSource()
+
+        when:
+        def result = source.getProperty(name)
+
+        then:
+        noExceptionThrown()
+        result == 'bar'
+
+        when: "check containsProperty()"
+        result = source.containsProperty(name)
+
+        then:
+        result == false
+
+        where:
+        name << [
+            '@appId:bar',
+            'foo:bar',
+            'foo:foo:bar',
+            'server.compression.mime-types[0]:bar',
+            'server.compression.mime-types[0]:foo:bar',
         ]
     }
 
@@ -249,35 +248,35 @@ class Tsc4jPropertySourceSpec extends Specification {
         result == expected
 
         when: "check containsProperty()"
-        result = source.containsProperty(name)
+        def containsProp = source.containsProperty(name)
 
         then:
         noExceptionThrown()
-        result == (expected != null)
+        containsProp == expectedContains
 
         where:
-        name                           | expected
-        'a'                            | 'b'
-        'b'                            | 10
-        'bar'                          | 'baz'
+        name                           | expected       | expectedContains
+        'a'                            | 'b'            | true
+        'b'                            | '10'           | true
+        'bar'                          | 'baz'          | true
 
-        'non.existent'                 | null
-        'non.existent:defaultValue'    | null
-        'non.existent[2]'              | null
-        'non.existent[2]:defaultValue' | null
+        'non.existent'                 | null           | false
+        'non.existent:defaultValue'    | 'defaultValue' | false
+        'non.existent[2]'              | null           | false
+        'non.existent[2]:defaultValue' | 'defaultValue' | false
 
-        'foo.bar:someDef'              | 'something'
-        'foo.bar'                      | 'something'
-        'foo.list'                     | [1, 2, 3]
-        'foo.list[0]'                  | 1
-        'foo.list[1]'                  | 2
-        'foo.list[2]'                  | 3
+        'foo.bar:someDef'              | 'something'    | false
+        'foo.bar'                      | 'something'    | true
+        'foo.list'                     | null           | false
+        'foo.list[0]'                  | '1'            | true
+        'foo.list[1]'                  | '2'            | true
+        'foo.list[2]'                  | '3'            | true
 
-        'foo.list[3]'                  | null
-        '@appId'                       | null
-        '.. foO..'                     | null
-        ' @appId '                     | null
-        '💩foo'                        | null
-        ' |💩foo 🤷|¯|_(ツ)_/¯'         | null
+        'foo.list[3]'                  | null           | false
+        '@appId'                       | null           | false
+        '.. foO..'                     | null           | false
+        ' @appId '                     | null           | false
+        '💩foo'                        | null           | false
+        ' |💩foo 🤷|¯|_(ツ)_/¯'         | null           | false
     }
 }

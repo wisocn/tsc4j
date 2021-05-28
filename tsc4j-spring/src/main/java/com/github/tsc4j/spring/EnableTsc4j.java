@@ -29,11 +29,11 @@ import java.lang.annotation.Target;
  * Enables {@link ReloadableConfig} as spring configuration source
  *
  * @see ReloadableConfig
- * @see Tsc4jConfiguration
+ * @see Tsc4jSpringConfiguration
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({Tsc4jConfiguration.class})
+@Import({Tsc4jSpringConfiguration.class})
 public @interface EnableTsc4j {
 }

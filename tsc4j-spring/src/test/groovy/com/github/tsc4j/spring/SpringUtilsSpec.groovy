@@ -65,4 +65,23 @@ class SpringUtilsSpec extends Specification {
 
         thrown(IllegalStateException)
     }
+
+    def "getAppName() should return expexted result"() {
+        given:
+        def env = Mock(Environment)
+        def expectedAppName = "my-super-spring-app"
+
+        def envAppName = sprintf(appFmt, expectedAppName)
+
+        when:
+        def appName = SpringUtils.getAppName(env)
+
+        then:
+        env.getProperty('spring.application.name') >> envAppName
+
+        appName == expectedAppName
+
+        where:
+        appFmt << ['%s', ' %s', '   %s  ']
+    }
 }

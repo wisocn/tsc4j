@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationContext
 
 import javax.inject.Inject
 
-class Tsc4jConfigurationSpec extends SpringSpec {
+class Tsc4JSpringConfigurationSpec extends SpringSpec {
     @Inject
     ApplicationContext ctx
 
@@ -34,7 +34,6 @@ class Tsc4jConfigurationSpec extends SpringSpec {
     Config config
 
     def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
     }
 
     def 'context should be wired'() {

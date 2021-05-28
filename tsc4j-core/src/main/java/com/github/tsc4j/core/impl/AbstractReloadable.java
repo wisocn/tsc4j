@@ -157,6 +157,11 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     @Override
+    protected boolean warnIfAlreadyClosed() {
+        return false;
+    }
+
+    @Override
     protected void doClose() {
         this.value = null;
         onUpdate.clear();

@@ -34,7 +34,6 @@ class Tsc4JSpringConfigurationSpec extends SpringSpec {
     Config config
 
     def cleanupSpec() {
-        SpringUtils.instanceHolder().close()
     }
 
     def 'context should be wired'() {

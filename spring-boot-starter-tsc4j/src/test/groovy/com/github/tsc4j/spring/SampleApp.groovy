@@ -28,7 +28,6 @@ import javax.annotation.PostConstruct
 
 @Slf4j
 @SpringBootApplication
-@EnableTsc4j
 class SampleApp {
     @Autowired
     Config config

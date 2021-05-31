@@ -107,8 +107,9 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
     }
 
     /**
-     * <p>Adds/registers new consumer that is going to be invoked on value update. Multiple consumers can be registered.
-     * Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is invoked with
+     * <p>Adds/registers new consumer that is going to be invoked on value update. Multiple consumers can be
+     * registered. Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is
+     * invoked with
      * <i>null</i> value</b> if value was previously present in reloadable (see {@link #isPresent()}) and has been
      * removed from config during refresh.
      * </p>
@@ -122,7 +123,20 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
     Reloadable<T> register(@NonNull Consumer<T> consumer);
 
     /**
-     * Unregisters all value update consumers and unsubscribes itself from value updates.
+     * Registers given runnable to that is going to be invoked as part of {@link #close()} invocation.
+     *
+     * @param action action to run on {@link #close()} invocation.
+     * @return reference to itself
+     * @throws NullPointerException  in case of null argument(s)
+     * @throws IllegalStateException if reloadable is closed
+     */
+    Reloadable<T> onClose(@NonNull Runnable action);
+
+    /**
+     * Closes reloadable, unsubscribes it from value updates and runs close action (see {@link #close()}); after
+     * invocation of this method other methods will throw {@link IllegalStateException}.
+     *
+     * @see #onClose(Runnable)
      */
     @Override
     void close();

@@ -742,4 +742,69 @@ abstract class AbstractReloadableSpec extends BaseSpec {
         numA == 0
         numB == 0
     }
+
+    def "onClose() should throw NPE in case of null arguments"() {
+        when:
+        emptyReloadable().onClose(null)
+
+        then:
+        thrown(NullPointerException)
+    }
+
+    def "onClose() should be ran upon closing"() {
+        given:
+        def onCloseInvoked = 0
+        def onCloseAction = {
+            onCloseInvoked++
+            if (exception) {
+                throw exception
+            }
+        }
+
+        and:
+        def r = reloadable.onClose(onCloseAction)
+
+        expect:
+        r instanceof Reloadable
+        r.onClose == onCloseAction
+
+        when:
+        r.close()
+
+        then:
+        noExceptionThrown()
+        onCloseInvoked == 1
+        r.onClose == null
+
+        when:
+        5.times { r.close() }
+
+        then:
+        noExceptionThrown()
+        onCloseInvoked == 1
+
+        where:
+        reloadable              | exception
+        emptyReloadable()       | null
+        emptyReloadable()       | new RuntimeException("boom")
+        createReloadable('foo') | null
+        createReloadable('foo') | new RuntimeException("boom")
+    }
+
+    def "onClose() should throw ISE on closed exception"() {
+        given: "close reloadable, then try to assign onclose"
+        reloadable.close()
+
+        expect:
+        reloadable.isClosed()
+
+        when:
+        reloadable.onClose({})
+
+        then:
+        thrown(IllegalStateException)
+
+        where:
+        reloadable << [emptyReloadable(), createReloadable('foo')]
+    }
 }

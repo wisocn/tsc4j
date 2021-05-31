@@ -118,8 +118,8 @@ public abstract class CloseableInstance implements Closeable {
     }
 
     /**
-     * Performs actual {@link #close()} functionality. Concrete implementations overriding this method should always
-     * call super method.
+     * Performs actual {@link #close()} functionality that is being invoked in atomic manner. Concrete implementations
+     * overriding this method should always call super method.
      *
      * @see #close()
      * @see #isClosed()

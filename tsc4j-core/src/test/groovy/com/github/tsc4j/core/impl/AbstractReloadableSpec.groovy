@@ -743,6 +743,67 @@ abstract class AbstractReloadableSpec extends BaseSpec {
         numB == 0
     }
 
+    def "onClear() should throw NPE in case of null arguments"() {
+        when:
+        emptyReloadable().onClear(null)
+
+        then:
+        thrown(NullPointerException)
+    }
+
+    def "onClear() should throw ISE on closed reloadable"() {
+        given: "close reloadable, then try to assign onclear"
+        reloadable.close()
+
+        expect:
+        reloadable.isClosed()
+
+        when:
+        reloadable.onClear({})
+
+        then:
+        thrown(IllegalStateException)
+
+        where:
+        reloadable << [emptyReloadable(), createReloadable('foo')]
+    }
+
+    def "onClear() should be ran only when value is removed"() {
+        given:
+        def onClearCalled = 0
+
+        and:
+        def r = reloadable.onClear({ onClearCalled++ })
+
+        when:
+        customizer.call(r)
+
+        then:
+        onClearCalled == expected
+
+        where:
+        reloadable              | customizer           | expected
+        emptyReloadable()       | { it.removeValue() } | 0
+        emptyReloadable()       | { it.setValue('x') } | 0
+
+        createReloadable('foo') | { it.setValue('x') } | 0
+        createReloadable('foo') | { it.removeValue() } | 1
+    }
+
+    def "onClear() action should not be ran when reloadable is closed"() {
+        given:
+        def onClearCalled = 0
+        def reloadable = createReloadable('foo')
+            .onClear({ onClearCalled++ })
+
+        when:
+        reloadable.close()
+
+        then:
+        reloadable.isClosed()
+        onClearCalled == 0
+    }
+
     def "onClose() should throw NPE in case of null arguments"() {
         when:
         emptyReloadable().onClose(null)
@@ -791,7 +852,7 @@ abstract class AbstractReloadableSpec extends BaseSpec {
         createReloadable('foo') | new RuntimeException("boom")
     }
 
-    def "onClose() should throw ISE on closed exception"() {
+    def "onClose() should throw ISE on closed reloadable"() {
         given: "close reloadable, then try to assign onclose"
         reloadable.close()
 

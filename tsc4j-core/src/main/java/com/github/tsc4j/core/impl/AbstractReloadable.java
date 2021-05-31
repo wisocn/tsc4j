@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -68,12 +69,17 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     /**
-     * Clears current stored value.
+     * Clears current stored value, without invoking {@link #onClear(Runnable)} action.
      *
      * @return optional of previously stored value.
      */
     private Optional<T> clearValue() {
-        val result = Optional.ofNullable(fetchValue());
+        val result = Optional.ofNullable(fetchValue())
+            .map(it -> {
+                log.debug("{} cleared stored value: {}", this, it);
+                return it;
+            });
+
         value = null;
         return result;
     }
@@ -151,13 +157,13 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     /**
-     * Removes value.
+     * Removes value stored value, runs {@link #onClear(Runnable)} actions.
      *
      * @return optional of previous value
+     * @throws IllegalStateException if instance is closed.
      */
     protected final Optional<T> removeValue() {
         checkClosed();
-        val value = fetchValue();
 
         // clear stored value
         val oldValueOpt = clearValue();
@@ -165,11 +171,9 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
         // run onClear action
         oldValueOpt.ifPresent(it -> Runnables.safeRun(this.onClear));
 
+        // TODO: remove this
         // run update consumers only if value was previously present
-        if (value != null) {
-            runOnUpdate();
-            log.debug("{} removed value.", this);
-        }
+        oldValueOpt.ifPresent(it -> runOnUpdate());
 
         return oldValueOpt;
     }
@@ -223,6 +227,11 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     @Override
+    public final <R> Reloadable<R> map(@NonNull Function<T, R> mapper) {
+        return new MappingReloadable<>(this, mapper);
+    }
+
+    @Override
     protected boolean warnIfAlreadyClosed() {
         return false;
     }
@@ -231,12 +240,15 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     protected void doClose() {
         super.doClose();
 
-        // clear actual value
+        // clear actual value without running onClear
         clearValue();
 
-        // run onClose action
+        // run onClose action and remove onClose
         Runnables.safeRun(onClose);
         this.onClose = null;
+
+        // remove onClear
+        this.onClear = null;
 
         onUpdate.clear();
     }

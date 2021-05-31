@@ -108,8 +108,8 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
 
     /**
      * <p>Adds/registers new consumer that is going to be invoked on value update. Multiple consumers can be
-     * registered. Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is
-     * invoked with
+     * registered.
+     * Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is invoked with
      * <i>null</i> value</b> if value was previously present in reloadable (see {@link #isPresent()}) and has been
      * removed from config during refresh.
      * </p>
@@ -123,7 +123,14 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
     Reloadable<T> register(@NonNull Consumer<T> consumer);
 
     /**
-     * Registers given runnable to that is going to be invoked as part of {@link #close()} invocation.
+     * Registers given runnable to be invoked when value gets cleared from this reloadable.
+     *
+     * @return reference to itself.
+     */
+    Reloadable<T> onClear(@NonNull Runnable onClear);
+
+    /**
+     * Registers given runnable to be invoked as part of {@link #close()} invocation.
      *
      * @param action action to run on {@link #close()} invocation.
      * @return reference to itself

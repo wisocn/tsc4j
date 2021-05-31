@@ -19,7 +19,6 @@ package com.github.tsc4j.core.impl;
 
 import com.github.tsc4j.api.Reloadable;
 import com.github.tsc4j.core.CloseableInstance;
-import com.github.tsc4j.core.Tsc4jImplUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -55,6 +54,11 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     protected volatile Runnable onClose;
 
     /**
+     * Action to be invoked when value gets cleared after it has been assigned.
+     */
+    protected volatile Runnable onClear;
+
+    /**
      * Fetches current stored value.
      *
      * @return current stored value, might be null.
@@ -68,7 +72,7 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      *
      * @return optional of previously stored value.
      */
-    protected final Optional<T> clearValue() {
+    private Optional<T> clearValue() {
         val result = Optional.ofNullable(fetchValue());
         value = null;
         return result;
@@ -154,14 +158,20 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     protected final Optional<T> removeValue() {
         checkClosed();
         val value = fetchValue();
-        clearValue();
+
+        // clear stored value
+        val oldValueOpt = clearValue();
+
+        // run onClear action
+        oldValueOpt.ifPresent(it -> Runnables.safeRun(this.onClear));
 
         // run update consumers only if value was previously present
         if (value != null) {
             runOnUpdate();
             log.debug("{} removed value.", this);
         }
-        return Optional.ofNullable(value);
+
+        return oldValueOpt;
     }
 
     /**
@@ -171,7 +181,9 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      */
     protected final void runOnUpdate() {
         val value = fetchValue();
-        onUpdate.forEach(consumer -> Tsc4jImplUtils.safeRunnable(() -> consumer.accept(value)).run());
+
+        // TODO: in the future don't run update consumers if `value` == null
+        onUpdate.forEach(consumer -> Consumers.safeRun(consumer, value));
         numUpdates.incrementAndGet();
     }
 
@@ -192,6 +204,14 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
      */
     protected final List<Consumer<T>> registered() {
         return new ArrayList<>(this.onUpdate);
+    }
+
+    @Override
+    public final Reloadable<T> onClear(@NonNull Runnable onClear) {
+        checkClosed();
+
+        this.onClear = onClear;
+        return this;
     }
 
     @Override

@@ -75,6 +75,11 @@ class ReloadableSpec extends Specification {
         }
 
         @Override
+        Reloadable onClear(@NonNull Runnable onClear) {
+            this
+        }
+
+        @Override
         Reloadable onClose(@NonNull Runnable action) {
             this
         }

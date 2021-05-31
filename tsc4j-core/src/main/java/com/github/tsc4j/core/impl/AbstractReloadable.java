@@ -50,6 +50,11 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     private volatile T value;
 
     /**
+     * Action to be ran on {@link #close()}.
+     */
+    protected volatile Runnable onClose;
+
+    /**
      * Fetches current stored value.
      *
      * @return current stored value, might be null.
@@ -190,13 +195,29 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     }
 
     @Override
+    public final Reloadable<T> onClose(@NonNull Runnable action) {
+        checkClosed();
+
+        this.onClose = action;
+        return this;
+    }
+
+    @Override
     protected boolean warnIfAlreadyClosed() {
         return false;
     }
 
     @Override
     protected void doClose() {
+        super.doClose();
+
+        // clear actual value
         clearValue();
+
+        // run onClose action
+        Runnables.safeRun(onClose);
+        this.onClose = null;
+
         onUpdate.clear();
     }
 }

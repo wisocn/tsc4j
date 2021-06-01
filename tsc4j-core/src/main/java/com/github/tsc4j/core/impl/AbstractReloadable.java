@@ -31,6 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -229,6 +230,11 @@ public abstract class AbstractReloadable<T> extends CloseableInstance implements
     @Override
     public final <R> Reloadable<R> map(@NonNull Function<T, R> mapper) {
         return new MappingReloadable<>(this, mapper);
+    }
+
+    @Override
+    public final Reloadable<T> filter(@NonNull Predicate<T> predicate) {
+        return new FilterReloadable<>(this, predicate);
     }
 
     @Override

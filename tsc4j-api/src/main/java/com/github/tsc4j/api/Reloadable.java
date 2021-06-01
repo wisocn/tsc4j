@@ -20,6 +20,7 @@ import lombok.NonNull;
 
 import java.io.Closeable;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -121,6 +122,16 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
      * @throws IllegalStateException if reloadable is closed
      */
     Reloadable<T> register(@NonNull Consumer<T> consumer);
+
+    /**
+     * Creates new reloadable that uses this reloadable as a source of updates and that applies given mapping function
+     * on value update.
+     *
+     * @param mapper mapping function that maps value of source reloadable and value of created reloadable
+     * @param <R>    destination type
+     * @return reloadable
+     */
+    <R> Reloadable<R> map(@NonNull Function<T, R> mapper);
 
     /**
      * Registers given runnable to be invoked when value gets cleared from this reloadable.

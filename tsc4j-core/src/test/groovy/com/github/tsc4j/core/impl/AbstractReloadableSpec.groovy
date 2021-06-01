@@ -35,6 +35,25 @@ abstract class AbstractReloadableSpec extends BaseSpec {
 
     protected abstract <T> Reloadable<T> removeReloadableValue(Reloadable<T> reloadable)
 
+    def "interface default methods should work as expected"() {
+        given:
+        def value = 'foo string'
+        def reloadable = createReloadable(value)
+
+        def consumer = { log.info("called with: {}", it) }
+
+        when:
+        def r = reloadable.ifPresentAndRegister(consumer)
+
+        then:
+        r.is(reloadable)
+        with(reloadable) {
+            isPresent()
+            !isEmpty()
+            registered().size() == 1
+        }
+    }
+
     def "empty reloadable should not contain value"() {
         given:
         def reloadable = emptyReloadable()

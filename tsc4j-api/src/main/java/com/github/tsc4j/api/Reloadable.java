@@ -21,6 +21,7 @@ import lombok.NonNull;
 import java.io.Closeable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -109,8 +110,8 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
 
     /**
      * <p>Adds/registers new consumer that is going to be invoked on value update. Multiple consumers can be
-     * registered.
-     * Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is invoked with
+     * registered. Consumer is invoked with newly assigned value when configuration changes; Note that <b>consumer is
+     * invoked with
      * <i>null</i> value</b> if value was previously present in reloadable (see {@link #isPresent()}) and has been
      * removed from config during refresh.
      * </p>
@@ -132,6 +133,15 @@ public interface Reloadable<T> extends Supplier<T>, Closeable {
      * @return reloadable
      */
     <R> Reloadable<R> map(@NonNull Function<T, R> mapper);
+
+    /**
+     * Creates new reloadable that this reloadable as a source of updates and that applies given predicate on value
+     * update.
+     *
+     * @param predicate stored value predicate.
+     * @return reloadable that filters value.
+     */
+    Reloadable<T> filter(@NonNull Predicate<T> predicate);
 
     /**
      * Registers given runnable to be invoked when value gets cleared from this reloadable.

@@ -31,7 +31,45 @@ class FilterReloadableSpec extends Specification {
         def result = it.length() > 5
         log.info("predicate invoked with: {} => {}", it, result);
         result
-    };
+    }
+
+    def "closing filter reloadable should close source reloadable"() {
+        given:
+        def reloadable = source.filter(predicate)
+
+        expect:
+        !source.isClosed()
+        !reloadable.isClosed()
+
+        when:
+        reloadable.close()
+
+        then:
+        source.isClosed()
+        reloadable.isClosed()
+
+        where:
+        source << [new TestReloadable<String>(), new TestReloadable<String>('foo')]
+    }
+
+    def "closing source reloadable should close filter reloadable"() {
+        given:
+        def reloadable = source.filter(predicate)
+
+        expect:
+        !source.isClosed()
+        !reloadable.isClosed()
+
+        when:
+        source.close()
+
+        then:
+        source.isClosed()
+        reloadable.isClosed()
+
+        where:
+        source << [new TestReloadable<String>(), new TestReloadable<String>('foo')]
+    }
 
     def "filter() should throw NPE in case of null arguments"() {
         when:

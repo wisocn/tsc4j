@@ -37,6 +37,7 @@ final class MappingReloadable<T, R> extends AbstractReloadable<R> {
     MappingReloadable(@NonNull Reloadable<T> upstream, @NonNull Function<T, R> mapper) {
         this.mapper = mapper;
         this.upstream = upstream
+            .onClose(this::close)
             .onClear(this::removeValue)
             .ifPresentAndRegister(this::updateValue);
     }

@@ -31,7 +31,45 @@ class MappingReloadableSpec extends Specification {
         log.info("mapper invoked with: {}", it);
 
         it.length()
-    };
+    }
+
+    def "closing mapping reloadable should close source reloadable"() {
+        given:
+        def reloadable = source.map(mappingFunction)
+
+        expect:
+        !source.isClosed()
+        !reloadable.isClosed()
+
+        when:
+        reloadable.close()
+
+        then:
+        source.isClosed()
+        reloadable.isClosed()
+
+        where:
+        source << [new TestReloadable<String>(), new TestReloadable<String>('foo')]
+    }
+
+    def "closing source reloadable should close mapping reloadable"() {
+        given:
+        def reloadable = source.map(mappingFunction)
+
+        expect:
+        !source.isClosed()
+        !reloadable.isClosed()
+
+        when:
+        source.close()
+
+        then:
+        source.isClosed()
+        reloadable.isClosed()
+
+        where:
+        source << [new TestReloadable<String>(), new TestReloadable<String>('foo')]
+    }
 
     def "map() should throw NPE in case of null arguments"() {
         when:

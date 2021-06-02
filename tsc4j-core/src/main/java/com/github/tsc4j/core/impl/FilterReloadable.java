@@ -36,6 +36,7 @@ final class FilterReloadable<T> extends AbstractReloadable<T> {
     FilterReloadable(@NonNull Reloadable<T> upstream, @NonNull Predicate<T> predicate) {
         this.predicate = predicate;
         this.upstream = upstream
+            .onClose(this::close)
             .onClear(this::removeValue)
             .ifPresentAndRegister(this::updateValue);
     }

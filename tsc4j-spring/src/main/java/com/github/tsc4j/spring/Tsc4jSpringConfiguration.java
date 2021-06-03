@@ -44,7 +44,6 @@ public class Tsc4jSpringConfiguration {
     @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ReloadableConfig reloadableConfig(@NonNull ConfigurableEnvironment env) {
         val rc = SpringUtils.reloadableConfig(env);
-        createAndRegisterTsc4jPropertySource(rc, env);
         log.debug("supplying reloadable config: {}", rc);
         return rc;
     }
@@ -63,16 +62,5 @@ public class Tsc4jSpringConfiguration {
         val config = rc.getSync();
         log.debug("supplying config bean (hashcode: {}).", config.hashCode());
         return config;
-    }
-
-    private Tsc4jPropertySource createAndRegisterTsc4jPropertySource(ReloadableConfig reloadableConfig,
-                                                                     ConfigurableEnvironment env) {
-        val propertySource = new Tsc4jPropertySource(reloadableConfig);
-        log.debug("{} created tsc4j spring property source: {}", this, propertySource);
-
-        // register created property source to spring environment
-        env.getPropertySources().addLast(propertySource);
-
-        return propertySource;
     }
 }

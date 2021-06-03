@@ -21,6 +21,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
@@ -31,6 +32,7 @@ import spock.lang.Unroll
 @Slf4j
 @Stepwise
 @Unroll
+@SpringBootTest(classes = SampleApp)
 class ApplicationConfViaTsc4jSpec extends SpringSpec {
     @Autowired
     ApplicationContext appCtx
@@ -47,6 +49,7 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         env != null
     }
 
+    @Ignore
     def "debug property sources"() {
         when:
         def propStr = SpringUtils.debugPropertySources(env)
@@ -119,7 +122,7 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         def bean = appCtx.getBean(MyHoconBeanA)
         log.info("got bean: {}", bean)
 
-        bean.list.each { log.info("{} {}", it?.class?.name, it) }
+        //bean.list.each { log.info("{} {}", it?.class?.name, it) }
 
         then:
         with(bean) {
@@ -181,7 +184,7 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         String baz
     }
 
-    @Ignore("this test fails for no good reason, figure out why")
+    //@Ignore("this test fails for no good reason, figure out why")
     def "spring context should contain component that declares @ConditionalOnProperty property defined in hocon"() {
         when:
         def component = appCtx.getBean(Tsc4jConditionalFeature)

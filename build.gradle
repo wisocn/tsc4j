@@ -12,7 +12,7 @@ buildscript {
     typesafeConfigVersion   = "1.4.1"
 
     slf4jVersion            = "1.7.28"
-    lombokVersion           = "1.18.16"
+    lombokVersion           = "1.18.20"
     awsSdkVersion           = "1.11.475"
     guiceVersion            = "4.2.3"
     logbackVersion          = "1.2.3"

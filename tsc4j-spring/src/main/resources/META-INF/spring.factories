@@ -1,0 +1,3 @@
+# Spring application listeners (enable and register tsc4j spring property source as early as possible)
+org.springframework.context.ApplicationListener=\
+    com.github.tsc4j.spring.Tsc4jBootstrapApplicationListener

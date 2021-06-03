@@ -95,7 +95,8 @@ public final class Tsc4jBootstrapApplicationListener implements Ordered, Applica
         val propSource = new Tsc4jPropertySource(rc);
         log.debug("created property source: {}" + propSource);
 
-        env.getPropertySources().addLast(propSource);
+        //env.getPropertySources().addLast(propSource);
+        env.getPropertySources().addFirst(propSource);
         log.debug("successfully registered tsc4j-spring property source.");
     }
 

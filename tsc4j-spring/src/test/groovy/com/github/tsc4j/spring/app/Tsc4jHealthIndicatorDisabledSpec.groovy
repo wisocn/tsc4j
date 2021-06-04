@@ -22,13 +22,17 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.test.annotation.DirtiesContext
+import spock.lang.Requires
 import spock.lang.Unroll
 
 @Unroll
 @Slf4j
+@DirtiesContext
 @SpringBootTest(properties = [
     'tsc4j.spring.health.enabled=false'
 ])
+@Requires({ sys.special == 'true' })
 class Tsc4jHealthIndicatorDisabledSpec extends SpringSpec {
     @Autowired
     ApplicationContext appCtx

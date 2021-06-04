@@ -22,13 +22,17 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.test.annotation.DirtiesContext
+import spock.lang.Requires
 import spock.lang.Unroll
 
 @Slf4j
 @Unroll
+@DirtiesContext
 @SpringBootTest(properties = [
     'tsc4j.spring.refresh.enabled=false'
 ])
+@Requires({ sys.special == 'true' })
 class Tsc4jSpringContextRefresherDisabledSpec extends SpringSpec {
     @Autowired
     ApplicationContext appCtx

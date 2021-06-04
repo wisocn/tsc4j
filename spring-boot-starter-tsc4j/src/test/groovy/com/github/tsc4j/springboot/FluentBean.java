@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2019 tsc4j project
+ * Copyright 2017 - 2021 tsc4j project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,23 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.springboot;
 
-
-import com.github.tsc4j.api.Tsc4jBeanBuilder;
-import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@Value
-@Builder
-@Tsc4jBeanBuilder
-//@Component
-@ConfigurationProperties("test.toBean")
-public class ImmutableBean {
+@Data
+@Accessors(chain = true)
+@Component
+@ConfigurationProperties("test.bean")
+public class FluentBean {
     private boolean aBoolean;
     private int aInt;
     private long aLong;

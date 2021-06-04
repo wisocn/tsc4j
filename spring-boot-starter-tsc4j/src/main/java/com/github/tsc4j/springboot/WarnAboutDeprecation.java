@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2019 tsc4j project
+ * Copyright 2017 - 2021 tsc4j project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,24 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.springboot;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
-@Data
-@Accessors(chain = true)
-@Component
-@ConfigurationProperties("test.bean")
-public class FluentBean {
-    private boolean aBoolean;
-    private int aInt;
-    private long aLong;
-    private double aDouble;
-    private String aString;
+import javax.annotation.PostConstruct;
+
+@Slf4j
+public final class WarnAboutDeprecation {
+    @PostConstruct
+    void init() {
+        log.warn("spring-boot-starter-tsc4j has been deprecated; please use tsc4j-spring instead.");
+    }
 }

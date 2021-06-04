@@ -23,6 +23,10 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 /**
  * Tsc4j health indicator. Returns {@link org.springframework.boot.actuate.health.Status#UP} if config fetch from
@@ -30,6 +34,10 @@ import org.springframework.boot.actuate.health.HealthIndicator;
  * org.springframework.boot.actuate.health.Status#DOWN}.
  */
 @Slf4j
+@Service
+@ConditionalOnMissingBean(Tsc4jHealthIndicator.class)
+@ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+@ConditionalOnProperty(value = Constants.PROP_HEALTH_ENABLED, matchIfMissing = true)
 class Tsc4jHealthIndicator implements HealthIndicator {
     private static final String ERR_KEY = "error";
     private final ReloadableConfig reloadableConfig;

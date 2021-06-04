@@ -23,21 +23,20 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 class Constants {
-    private static final String PREFIX = "tsc4j.spring.";
+    static final String PROP_PREFIX = "tsc4j.spring.";
+
     /**
-     * Spring boolean property defining whether tsc4j is enabled (value: <b>{@value}</b>)
+     * Spring boolean property defining whether tsc4j {@link org.springframework.boot.actuate.health.HealthIndicator} is
+     * enabled.
      *
      * @see org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
      */
-    static final String PROPERTY_ENABLED = PREFIX + "enabled";
+    static final String PROP_HEALTH_ENABLED = PROP_PREFIX + "health.enabled";
 
     /**
      * Spring boolean property defining whether tsc4j configuration change should trigger spring-context refresh
-     * (value:
-     * <b>{@value}</b>)
      *
-     * @see Tsc4jContextRefreshSpringConfiguration
      * @see org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
      */
-    static final String PROPERTY_REFRESH_CONTEXT = PREFIX + "refresh.enabled";
+    static final String PROP_REFRESH_CONTEXT = PROP_PREFIX + "refresh.enabled";
 }

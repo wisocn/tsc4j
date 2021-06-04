@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.springboot
 
-import com.github.tsc4j.api.Tsc4jBeanBuilder;
-import lombok.Builder;
-import lombok.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import spock.lang.Specification
 
-@Value
-@Builder
-@Tsc4jBeanBuilder
-//@Component
-@ConfigurationProperties("test.toBean")
-public class ImmutableBean {
-    private boolean aBoolean;
-    private int aInt;
-    private long aLong;
-    private double aDouble;
-    private String aString;
+@ActiveProfiles(["test", "funky"])
+@SpringBootTest(classes = SampleApp)
+abstract class SpringSpec extends Specification {
 }

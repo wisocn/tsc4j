@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.spring.app;
 
-import lombok.Data;
+import com.github.tsc4j.api.Tsc4jBeanBuilder;
+import lombok.Builder;
+import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Data
-@Component
-@ConfigurationProperties("test.bean")
-public class StandardBean {
+@Value
+@Builder
+@Tsc4jBeanBuilder
+@ConfigurationProperties("test.toBean")
+public class ImmutableBean {
     private boolean aBoolean;
     private int aInt;
     private long aLong;

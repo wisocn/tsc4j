@@ -1,0 +1,9 @@
+# Spring application listeners (enable and register tsc4j spring property source as early as possible)
+org.springframework.context.ApplicationListener=\
+    com.github.tsc4j.spring.Tsc4jBootstrapApplicationListener
+
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.github.tsc4j.spring.Tsc4jSpringConfiguration,\
+    com.github.tsc4j.spring.Tsc4jHealthIndicator,\
+    com.github.tsc4j.spring.Tsc4jSpringContextRefresher

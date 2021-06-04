@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring
+package com.github.tsc4j.spring.app
 
 import com.github.tsc4j.api.Reloadable
 import com.github.tsc4j.api.ReloadableConfig
@@ -32,7 +32,6 @@ import javax.annotation.PostConstruct
 
 @Slf4j
 @SpringBootApplication
-@EnableTsc4j
 class SampleApp {
     @Autowired
     ReloadableConfig reloadableConfig

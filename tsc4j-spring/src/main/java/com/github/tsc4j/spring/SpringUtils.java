@@ -144,16 +144,20 @@ class SpringUtils {
      * @return property source info as a string
      */
     String debugPropertySources(@NonNull ConfigurableEnvironment env) {
-        return env.getPropertySources().stream()
+        val propSources = env.getPropertySources();
+        val profiles = Arrays.asList(env.getActiveProfiles());
+        val prefix = "SPRING ENVIRONMENT PROPERTY SOURCES FOR PROFILES `" + profiles + "` (" + propSources.size() + "):\n";
+        val suffix = propSources.stream()
             .filter(it -> !it.getName().equals("systemProperties"))
             .filter(it -> !it.getName().equals("systemEnvironment"))
             .map(SpringUtils::debugPropertySource)
             .collect(Collectors.joining("\n"));
+        return prefix + suffix;
     }
 
     private String debugPropertySource(PropertySource<?> it) {
         val sb = new StringBuilder();
-        sb.append("PROPERTY SOURCE: " + it.getName() + " [" + it.getClass().getName() + "]\n");
+        sb.append("PROPERTY SOURCE: `" + it.getName() + "` [" + it.getClass().getName() + "]\n");
         if (it instanceof EnumerablePropertySource) {
             val ms = Stream.of(((EnumerablePropertySource<?>) it).getPropertyNames())
                 .sorted()
@@ -298,5 +302,15 @@ class SpringUtils {
     String getAppName(@NonNull Environment env) {
         return Tsc4jImplUtils.optString(env.getProperty("spring.application.name"))
             .orElseThrow(() -> new IllegalStateException("Can't determine application name from spring environment"));
+    }
+
+    /**
+     * Returns tsc4j-spring property name with a given suffix..
+     *
+     * @param suffix property name suffix without leading dog.
+     * @return property name.
+     */
+    String propName(@NonNull String suffix) {
+        return Tsc4jImplUtils.tsc4jPropName("spring." + suffix);
     }
 }

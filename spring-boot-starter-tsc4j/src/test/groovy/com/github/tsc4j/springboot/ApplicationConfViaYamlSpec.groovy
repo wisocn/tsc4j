@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring
+package com.github.tsc4j.springboot
 
+import com.github.tsc4j.spring.SpringUtils
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,14 +25,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
 @Slf4j
 @Stepwise
 @Unroll
-class ApplicationConfViaTsc4jSpec extends SpringSpec {
+class ApplicationConfViaYamlSpec extends SpringSpec {
     @Autowired
     ApplicationContext appCtx
 
@@ -56,37 +56,37 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         true
     }
 
-    def "env should contain expect config properties from application-test.conf"() {
+    def "env should contain expect config properties from application.yml"() {
         expect: "assert application.yml values"
+
         // simple values
-        env.getProperty('hocon.some.bool') == 'true'
-        env.getProperty('hocon.some.int') == '42'
-        env.getProperty('hocon.some.another-int') == '42'
+        env.getProperty('yaml.some.bool') == 'true'
+        env.getProperty('yaml.some.int') == '42'
+        env.getProperty('yaml.some.another-int') == '42'
 
         // map top-level element should return null 😱😱😱
         env.getProperty('yaml.some.map') == null
         env.getProperty('yaml.some.map', Map) == null
 
         // map handling
-        env.getProperty('hocon.some.map.foo') == 'bar'
-        env.getProperty('hocon.some.map.bar') == 'baz'
+        env.getProperty('yaml.some.map.foo') == 'bar'
+        env.getProperty('yaml.some.map.bar') == 'baz'
 
         // list handling
-        env.getProperty('hocon.some.list[0]') == 'a'
-        env.getProperty('hocon.some.list[1]') == 'b'
-        env.getProperty('hocon.some.list[2]') == 'b'
-        env.getProperty('hocon.some.list[3]') == 'c'
-        env.getProperty('hocon.some.list[4]') == 'null'
-        env.getProperty('hocon.some.list[5]') == '' // yaml nulls get mapped into empty string
-        env.getProperty('hocon.some.list[6]') == 'd'
-        env.getProperty('hocon.some.list[7]') == '39'
-        env.getProperty('hocon.some.list[8]') == ' 39 '
-        env.getProperty('hocon.some.list[9]') == null
+        env.getProperty('yaml.some.list[0]') == 'a'
+        env.getProperty('yaml.some.list[1]') == 'b'
+        env.getProperty('yaml.some.list[2]') == 'b'
+        env.getProperty('yaml.some.list[3]') == 'c'
+        env.getProperty('yaml.some.list[4]') == 'null'
+        env.getProperty('yaml.some.list[5]') == '' // yaml nulls get mapped into empty string
+        env.getProperty('yaml.some.list[6]') == 'd'
+        env.getProperty('yaml.some.list[7]') == '39'
+        env.getProperty('yaml.some.list[8]') == ' 39 '
+        env.getProperty('yaml.some.list[9]') == null
 
         //      list top level list element should return null 😱😱😱
-        // TODO: fix it
-        //env.getProperty('hocon.some.list') == null
-        //env.getProperty('hocon.some.list', List) == null
+        env.getProperty('yaml.some.list') == null
+        env.getProperty('yaml.some.list', List) == null
     }
 
     def "should return string: #key"() {
@@ -99,48 +99,58 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
 
         where:
         key << [
-            'hocon.some.map.foo',
-            'hocon.some.map.bar',
+            'yaml.some.map.foo',
+            'yaml.some.map.bar',
 
-            'hocon.some.list[0]',
-            'hocon.some.list[1]',
-            'hocon.some.list[2]',
-            'hocon.some.list[3]',
-            'hocon.some.list[4]',
-            'hocon.some.list[5]',
-            'hocon.some.list[6]',
-            'hocon.some.list[7]',
-            'hocon.some.list[8]',
+            'yaml.some.list[0]',
+            'yaml.some.list[1]',
+            'yaml.some.list[2]',
+            'yaml.some.list[3]',
+            'yaml.some.list[4]',
+            'yaml.some.list[5]',
+            'yaml.some.list[6]',
+            'yaml.some.list[7]',
+            'yaml.some.list[8]',
         ]
     }
 
     def "should produce expected configproperties bean: A"() {
         when:
-        def bean = appCtx.getBean(MyHoconBeanA)
-        log.info("got bean: {}", bean)
-
-        bean.list.each { log.info("{} {}", it?.class?.name, it) }
+        def bean = appCtx.getBean(MyYamlBeanA)
 
         then:
         with(bean) {
-            //list.size() == 2
             list == ['a', 'b', 'b', 'c', 'null', '', 'd', '39', ' 39 ']
             map == ['foo': 'bar', 'bar': 'baz']
         }
     }
 
+    def "getting values should work as well"() {
+        expect:
+        env.resolvePlaceholders(text) == expected
+
+        where:
+        text                                                             | expected
+        '${non.existent.a}'                                              | '${non.existent.a}'
+        ' 🤯 ${non.existent.a} XX '                                      | ' 🤯 ${non.existent.a} XX '
+        ' 🤯 ${non.existent.b:defaultValue}  '                           | ' 🤯 defaultValue  '
+        ' 🤯${yaml.some.map.foo } 🤯'                                    | ' 🤯${yaml.some.map.foo } 🤯'
+        ' 🤯${yaml.some.map.foo} 🤯'                                     | ' 🤯bar 🤯'
+        '${yaml.some.map.bar} ${yaml.some.map.non-exist:hello}'          | 'baz hello'
+        '${yaml.some.map.bar} ${yaml.some.map.foo} ${yaml.some.list[8]}' | 'baz bar  39 '
+    }
+
     @Component
-    @ConfigurationProperties("hocon.some")
+    @ConfigurationProperties("yaml.some")
     @ToString(includeNames = true, includePackage = false)
-    static class MyHoconBeanA {
+    static class MyYamlBeanA {
         List<String> list
         Map<String, String> map
     }
 
     def "should produce expected configproperties bean: B"() {
         when:
-        def bean = appCtx.getBean(MyHoconBeanB)
-        log.info("got bean: {}", bean)
+        def bean = appCtx.getBean(MyYamlBeanB)
 
         then:
         with(bean) {
@@ -151,25 +161,10 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         }
     }
 
-    def "getting values should work as well"() {
-        expect:
-        env.resolvePlaceholders(text) == expected
-
-        where:
-        text                                                                | expected
-        '${non.existent.a}'                                                 | '${non.existent.a}'
-        ' 🤯 ${non.existent.a} XX '                                         | ' 🤯 ${non.existent.a} XX '
-        ' 🤯 ${non.existent.b:defaultValue}  '                              | ' 🤯 defaultValue  '
-        ' 🤯${hocon.some.map.foo } 🤯'                                      | ' 🤯${hocon.some.map.foo } 🤯'
-        ' 🤯${hocon.some.map.foo} 🤯'                                       | ' 🤯bar 🤯'
-        '${hocon.some.map.bar} ${hocon.some.map.non-exist:hello}'           | 'baz hello'
-        '${hocon.some.map.bar} ${hocon.some.map.foo} ${hocon.some.list[8]}' | 'baz bar  39 '
-    }
-
     @Component
-    @ConfigurationProperties("hocon.some")
+    @ConfigurationProperties("yaml.some")
     @ToString(includeNames = true, includePackage = false)
-    static class MyHoconBeanB {
+    static class MyYamlBeanB {
         Set<String> list
         MyFoo map
     }
@@ -181,21 +176,20 @@ class ApplicationConfViaTsc4jSpec extends SpringSpec {
         String baz
     }
 
-    @Ignore("this test fails for no good reason, figure out why")
-    def "spring context should contain component that declares @ConditionalOnProperty property defined in hocon"() {
+    def "spring context should contain component that declares @ConditionalOnProperty property defined in yaml"() {
         when:
-        def component = appCtx.getBean(Tsc4jConditionalFeature)
+        def component = appCtx.getBean(YamlConditionalFeature)
 
         then:
         component != null
-        component.hello() == 'my-super-val-39'
+        component.hello() == 'my-super-val-37'
     }
 
     @ToString(includeNames = true, includePackage = false)
     @Component
-    @ConditionalOnProperty(name = "hocon.some.feature.enabled", havingValue = "true")
-    @ConfigurationProperties("hocon.some.feature")
-    static class Tsc4jConditionalFeature {
+    @ConditionalOnProperty(name = "yaml.some.feature.enabled", havingValue = "true")
+    @ConfigurationProperties("yaml.some.feature")
+    static class YamlConditionalFeature {
         String someVal
 
         String hello() {

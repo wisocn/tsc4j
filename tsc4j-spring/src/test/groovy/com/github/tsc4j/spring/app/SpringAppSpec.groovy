@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring
+package com.github.tsc4j.spring.app
 
 import com.github.tsc4j.api.ReloadableConfig
+import com.github.tsc4j.spring.Tsc4jHealthIndicator
+import com.github.tsc4j.spring.Tsc4jSpringContextRefresher
 import com.typesafe.config.Config
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,6 +51,7 @@ class SpringAppSpec extends SpringSpec {
         ctx.getBean(ReloadableConfig) != null
         ctx.getBean(Config) != null
         ctx.getBean(Tsc4jHealthIndicator) != null
+        ctx.getBean(Tsc4jSpringContextRefresher) != null
     }
 
     @Ignore

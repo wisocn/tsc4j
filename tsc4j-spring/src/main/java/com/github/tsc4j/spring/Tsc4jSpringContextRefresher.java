@@ -22,9 +22,13 @@ import com.github.tsc4j.core.CloseableInstance;
 import com.typesafe.config.Config;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -33,6 +37,10 @@ import java.util.function.Function;
  * Spring-context refresher that refreshes context when tsc4j config changes.
  */
 @Slf4j
+@Service
+@ConditionalOnMissingBean(Tsc4jSpringContextRefresher.class)
+@ConditionalOnClass(ContextRefresher.class)
+@ConditionalOnProperty(value = Constants.PROP_REFRESH_CONTEXT, matchIfMissing = true)
 class Tsc4jSpringContextRefresher extends CloseableInstance implements EnvironmentAware {
     private final AtomicLong numRefreshes = new AtomicLong();
     private final ContextRefresher contextRefresher;

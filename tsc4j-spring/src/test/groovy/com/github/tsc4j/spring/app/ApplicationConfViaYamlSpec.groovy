@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring
+package com.github.tsc4j.spring.app
 
+import com.github.tsc4j.spring.SpringUtils
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +25,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
@@ -46,6 +48,7 @@ class ApplicationConfViaYamlSpec extends SpringSpec {
         env != null
     }
 
+    @Ignore
     def "debug property sources"() {
         when:
         def propStr = SpringUtils.debugPropertySources(env)

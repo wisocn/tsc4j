@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2019 tsc4j project
+ * Copyright 2017 - 2021 tsc4j project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 package com.github.tsc4j.spring
 
+import com.github.tsc4j.spring.SpringUtils
 import org.springframework.core.env.Environment
 import spock.lang.Specification
 import spock.lang.Unroll

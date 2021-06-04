@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.spring.app;
 
 import com.github.tsc4j.api.Tsc4jBeanBuilder;
 import lombok.Builder;
@@ -24,7 +24,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Value
 @Builder
 @Tsc4jBeanBuilder
-//@Component
 @ConfigurationProperties("test.toBean")
 public class ImmutableBean {
     private boolean aBoolean;

@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.spring.app
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import spock.lang.Specification
 
-@Data
-@Accessors(chain = true)
-@Component
-@ConfigurationProperties("test.bean")
-public class FluentBean {
-    private boolean aBoolean;
-    private int aInt;
-    private long aLong;
-    private double aDouble;
-    private String aString;
+@ActiveProfiles(["test", "funky"])
+@SpringBootTest(classes = SampleApp)
+abstract class SpringSpec extends Specification {
 }

@@ -35,5 +35,14 @@ yaml.some:
     foo: bar
     bar: baz
 
+
+# the following section is defined in HOCON and YAML; values from HOCON should be preferred
+common.settings:
+  str:  value-from-yaml
+  list:
+    - 1
+    - 2
+    - 3
+
 # vim:shiftwidth=2 softtabstop=2 expandtab
 # EOF

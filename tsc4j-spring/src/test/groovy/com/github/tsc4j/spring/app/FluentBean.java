@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.tsc4j.spring;
+package com.github.tsc4j.spring.app;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
+@Accessors(chain = true)
 @Component
 @ConfigurationProperties("test.bean")
-public class StandardBean {
+public class FluentBean {
     private boolean aBoolean;
     private int aInt;
     private long aLong;

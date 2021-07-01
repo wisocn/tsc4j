@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import static com.github.tsc4j.spring.Constants.PROP_SPRING_APP_NAME;
+
 /**
  * Tsc4j spring early-startup application listener which initializes {@link com.github.tsc4j.api.ReloadableConfig} and
  * registers {@link Tsc4jPropertySource} into {@link ConfigurableEnvironment} as early as possible
@@ -40,6 +42,7 @@ import java.util.function.Predicate;
 @Slf4j
 public final class Tsc4jBootstrapApplicationListener implements Ordered, ApplicationListener<ApplicationPreparedEvent> {
     private static final AtomicBoolean registrationAlreadyDone = new AtomicBoolean();
+    private static final AtomicBoolean warnedAboutDisabled = new AtomicBoolean();
 
     @Override
     public int getOrder() {
@@ -51,20 +54,32 @@ public final class Tsc4jBootstrapApplicationListener implements Ordered, Applica
         val appCtx = event.getApplicationContext();
         val env = appCtx.getEnvironment();
 
+        // should we do it?
+        if (!shouldRegisterPropertySource(appCtx, env)) {
+            if (warnedAboutDisabled.compareAndSet(false, true)) {
+                log.info("tsc4j-spring early property source registration is disabled.");
+            }
+            return;
+        }
+
+        // can we do it?
+        if (!canRegisterPropertySource(env)) {
+            log.debug("tsc4j-spring prerequisites are not satisfied, skipping registration attempt.");
+            return;
+        }
+
+        // have we already done it?
         if (hasRegistrationAlreadyHappened()) {
             makeSureThatTsc4jPropSourceIsPreferred(env);
             return;
         }
 
+        // okay, let's do it
         if (isBootstrapDebugEnabled(env)) {
             log.info("{}", SpringUtils.debugPropertySources(env));
         }
 
-        if (shouldRegisterPropertySource(appCtx, env)) {
-            registerTsc4jPropertySource(env);
-        } else {
-            log.info("tsc4j-spring early property source registration is disabled.");
-        }
+        registerTsc4jPropertySource(env);
     }
 
     private Optional<PropertySource<?>> findPropertySource(MutablePropertySources mps,
@@ -72,6 +87,19 @@ public final class Tsc4jBootstrapApplicationListener implements Ordered, Applica
         return mps.stream()
             .filter(predicate::test)
             .findFirst();
+    }
+
+    /**
+     * Tells whether all prerequisites for registering {@link Tsc4jPropertySource} are satisfied.
+     *
+     * @param env spring environment
+     * @return true/false
+     */
+    private boolean canRegisterPropertySource(ConfigurableEnvironment env) {
+        // we absolutely need application name
+        val appName = env.getProperty(PROP_SPRING_APP_NAME, "").trim();
+
+        return !appName.isEmpty();
     }
 
     /**
@@ -87,7 +115,6 @@ public final class Tsc4jBootstrapApplicationListener implements Ordered, Applica
             log.debug("tsc4j spring early bootstrap is disabled.");
             return false;
         }
-
         return true;
     }
 

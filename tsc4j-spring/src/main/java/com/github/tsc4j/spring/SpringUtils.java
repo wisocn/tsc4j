@@ -47,6 +47,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.github.tsc4j.spring.Constants.PROP_SPRING_APP_NAME;
+
 /**
  * Various spring-related utilities.
  */
@@ -300,7 +302,7 @@ class SpringUtils {
      * @throws IllegalStateException if application name can't be determined
      */
     String getAppName(@NonNull Environment env) {
-        return Tsc4jImplUtils.optString(env.getProperty("spring.application.name"))
+        return Tsc4jImplUtils.optString(env.getProperty(PROP_SPRING_APP_NAME))
             .orElseThrow(() -> new IllegalStateException("Can't determine application name from spring environment"));
     }
 

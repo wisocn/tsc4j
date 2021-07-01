@@ -26,6 +26,12 @@ class Constants {
     static final String PROP_PREFIX = "tsc4j.spring.";
 
     /**
+     * Spring application name property
+     */
+    static final String PROP_SPRING_APP_NAME = "spring.application.name";
+
+
+    /**
      * Spring boolean property defining whether tsc4j {@link org.springframework.boot.actuate.health.HealthIndicator} is
      * enabled.
      *

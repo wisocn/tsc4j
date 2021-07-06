@@ -1718,7 +1718,7 @@ public class Tsc4jImplUtils {
     private static ConfigTransformer createConfigValueTransformer(@NonNull Collection<ConfigValueProvider> configValueProviders) {
         val transformer = ConfigValueProviderConfigTransformer.builder()
             .withProviders(configValueProviders)
-            .setAllowErrors(true)
+            .setAllowErrors(false)
             .build();
         log.info("created config transformer from {} value provider(s): {}", configValueProviders.size(), configValueProviders);
         return transformer;

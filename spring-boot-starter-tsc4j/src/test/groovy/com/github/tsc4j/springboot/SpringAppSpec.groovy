@@ -37,7 +37,6 @@ class SpringAppSpec extends SpringSpec {
 
         ctx.getBean(ReloadableConfig) != null
         ctx.getBean(Config) != null
-        ctx.getBean(Tsc4jHealthIndicator) != null
         ctx.getBean(Tsc4jSpringContextRefresher) != null
     }
 

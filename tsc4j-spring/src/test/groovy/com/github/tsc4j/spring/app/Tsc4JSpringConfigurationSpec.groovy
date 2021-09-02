@@ -17,7 +17,6 @@
 package com.github.tsc4j.spring.app
 
 import com.github.tsc4j.api.ReloadableConfig
-import com.github.tsc4j.spring.Tsc4jHealthIndicator
 import com.github.tsc4j.spring.Tsc4jSpringContextRefresher
 import com.typesafe.config.Config
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,7 +55,7 @@ class Tsc4JSpringConfigurationSpec extends SpringSpec {
         beans.every({ it == first })
 
         where:
-        clazz << [ReloadableConfig, Tsc4jSpringContextRefresher, Tsc4jHealthIndicator]
+        clazz << [ReloadableConfig, Tsc4jSpringContextRefresher]
     }
 
     def "config should be the same until reloadable doesn't reload config"() {

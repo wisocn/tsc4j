@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnMissingBean(Tsc4jHealthIndicator.class)
 @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
-@ConditionalOnProperty(value = Constants.PROP_HEALTH_ENABLED, matchIfMissing = true)
+@ConditionalOnProperty(value = Constants.PROP_HEALTH_ENABLED, matchIfMissing = false)
 class Tsc4jHealthIndicator implements HealthIndicator {
     private static final String ERR_KEY = "error";
     private final ReloadableConfig reloadableConfig;

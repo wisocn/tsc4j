@@ -38,19 +38,14 @@ class SpringAppSpec extends SpringSpec {
     @Autowired
     Config config
 
-    @Autowired
-    Tsc4jHealthIndicator healthIndicator
-
     def "context should be wired"() {
         expect:
         ctx != null
         reloadableConfig != null
         config != null
-        healthIndicator != null
 
         ctx.getBean(ReloadableConfig) != null
         ctx.getBean(Config) != null
-        ctx.getBean(Tsc4jHealthIndicator) != null
         ctx.getBean(Tsc4jSpringContextRefresher) != null
     }
 
